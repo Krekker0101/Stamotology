@@ -1,0 +1,75 @@
+2026-07-02 17:42:09,101 - database - INFO - Database tables created successfully
+2026-07-02 17:42:09,102 - database - INFO - Database initialized at C:\Users\hp\Desktop\Projects\teeth#1\laboratory.db
+2026-07-02 17:42:10,614 - matplotlib.font_manager - INFO - generated new fontManager
+2026-07-02 17:42:10,892 - __main__ - INFO - Initializing database...
+2026-07-02 17:42:10,896 - database - INFO - Database tables created successfully
+2026-07-02 17:42:10,897 - database - INFO - Database initialized at C:\Users\hp\Desktop\Projects\teeth#1\laboratory.db
+2026-07-02 17:42:10,897 - __main__ - INFO - Initializing default data...
+2026-07-02 17:42:11,143 - database - INFO - Default admin user created
+2026-07-02 17:42:11,144 - database - INFO - Default theme setting created
+2026-07-02 17:42:11,205 - database - INFO - Database initialized with default data
+2026-07-02 17:42:11,205 - __main__ - INFO - Application started successfully
+2026-07-02 17:42:34,524 - services.auth - INFO - User admin authenticated successfully
+2026-07-02 17:42:34,550 - database - INFO - Database connection closed
+2026-07-02 17:42:34,550 - __main__ - INFO - Application closed
+2026-07-02 17:45:06,203 - database - INFO - Database tables created successfully
+2026-07-02 17:45:06,204 - database - INFO - Database initialized at C:\Users\hp\Desktop\Projects\teeth#1\laboratory.db
+2026-07-02 17:45:06,980 - __main__ - INFO - Initializing database...
+2026-07-02 17:45:06,982 - database - INFO - Database tables created successfully
+2026-07-02 17:45:06,982 - database - INFO - Database initialized at C:\Users\hp\Desktop\Projects\teeth#1\laboratory.db
+2026-07-02 17:45:06,982 - __main__ - INFO - Initializing default data...
+2026-07-02 17:45:07,064 - database - INFO - Database initialized with default data
+2026-07-02 17:45:07,065 - __main__ - INFO - Application started successfully
+2026-07-02 17:45:18,756 - services.auth - INFO - User admin authenticated successfully
+2026-07-02 17:45:18,758 - __main__ - INFO - User admin logged in successfully
+2026-07-02 17:49:34,138 - database - INFO - Database connection closed
+2026-07-02 17:49:34,139 - __main__ - INFO - Application closed
+2026-07-02 17:49:37,116 - database - INFO - Database tables created successfully
+2026-07-02 17:49:37,117 - database - INFO - Database initialized at C:\Users\hp\Desktop\Projects\teeth#1\laboratory.db
+2026-07-02 17:49:37,866 - __main__ - INFO - Initializing database...
+2026-07-02 17:49:37,868 - database - INFO - Database tables created successfully
+2026-07-02 17:49:37,868 - database - INFO - Database initialized at C:\Users\hp\Desktop\Projects\teeth#1\laboratory.db
+2026-07-02 17:49:37,868 - __main__ - INFO - Initializing default data...
+2026-07-02 17:49:37,961 - database - INFO - Database initialized with default data
+2026-07-02 17:49:37,962 - __main__ - INFO - Application started successfully
+2026-07-02 17:49:45,255 - services.auth - INFO - User admin authenticated successfully
+2026-07-02 17:49:45,256 - __main__ - INFO - User admin logged in successfully
+2026-07-02 17:50:31,970 - services.patient - INFO - Patient Imomov created successfully
+2026-07-02 17:51:09,377 - database - INFO - Database connection closed
+2026-07-02 17:51:09,378 - __main__ - INFO - Application closed
+2026-07-04 22:39:16,599 - database - INFO - Database tables created successfully
+2026-07-04 22:39:16,599 - database - INFO - Database initialized at C:\Users\hp\Desktop\Projects\teeth#1\laboratory.db
+2026-07-04 22:39:17,569 - __main__ - INFO - Initializing database...
+2026-07-04 22:39:17,571 - database - INFO - Database tables created successfully
+2026-07-04 22:39:17,571 - database - INFO - Database initialized at C:\Users\hp\Desktop\Projects\teeth#1\laboratory.db
+2026-07-04 22:39:17,571 - __main__ - INFO - Initializing default data...
+2026-07-04 22:39:17,583 - database - INFO - Database initialized with default data
+2026-07-04 22:39:17,583 - __main__ - INFO - Application started successfully
+2026-07-04 22:39:24,907 - services.auth - INFO - User admin authenticated successfully
+2026-07-04 22:39:24,908 - __main__ - INFO - User admin logged in successfully
+2026-07-04 22:39:52,067 - database - INFO - Database connection closed
+2026-07-04 22:39:52,071 - __main__ - INFO - Application closed
+2026-07-05 22:19:20,721 - database - INFO - Database tables created successfully
+2026-07-05 22:19:20,722 - database - INFO - Database initialized at C:\Users\hp\Desktop\Projects\teeth#1\laboratory.db
+2026-07-05 22:19:21,856 - __main__ - INFO - Initializing database...
+2026-07-05 22:19:21,858 - database - INFO - Database tables created successfully
+2026-07-05 22:19:21,858 - database - INFO - Database initialized at C:\Users\hp\Desktop\Projects\teeth#1\laboratory.db
+2026-07-05 22:19:21,858 - __main__ - INFO - Initializing default data...
+2026-07-05 22:19:21,945 - database - INFO - Database initialized with default data
+2026-07-05 22:19:21,946 - __main__ - INFO - Application started successfully
+2026-07-05 22:19:31,126 - services.auth - INFO - User admin authenticated successfully
+2026-07-05 22:19:31,127 - __main__ - INFO - User admin logged in successfully
+2026-07-05 22:20:17,788 - database - INFO - Database connection closed
+2026-07-05 22:20:17,788 - __main__ - INFO - Application closed
+2026-07-06 16:59:46,818 - database - INFO - Database tables created successfully
+2026-07-06 16:59:46,819 - database - INFO - Database initialized at C:\Users\hp\Desktop\Projects\teeth#1\laboratory.db
+2026-07-06 16:59:48,158 - __main__ - INFO - Initializing database...
+2026-07-06 16:59:48,162 - database - INFO - Database tables created successfully
+2026-07-06 16:59:48,163 - database - INFO - Database initialized at C:\Users\hp\Desktop\Projects\teeth#1\laboratory.db
+2026-07-06 16:59:48,163 - __main__ - INFO - Initializing default data...
+2026-07-06 16:59:48,232 - database - INFO - Database initialized with default data
+2026-07-06 16:59:48,232 - __main__ - INFO - Application started successfully
+2026-07-06 16:59:56,430 - services.auth - INFO - User admin authenticated successfully
+2026-07-06 16:59:56,431 - __main__ - INFO - User admin logged in successfully
+2026-07-06 17:00:32,965 - database - INFO - Database connection closed
+2026-07-06 17:00:32,965 - __main__ - INFO - Application closed
