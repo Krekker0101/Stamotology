@@ -117,6 +117,27 @@ class DatabaseManager:
             self.engine.dispose()
         logger.info("Database connection closed")
 
+    def switch_database(self, new_db_path):
+        """Switch to another database file at runtime.
+
+        Closes current connections, updates the config DB_PATH, and
+        reinitializes the engine and session factory against the new file.
+        """
+        try:
+            new_path = Path(new_db_path)
+            # Close current connections
+            self.close()
+            # Update global config path
+            import config as _config
+            _config.config.DB_PATH = new_path
+            # Update internal path and reinitialize
+            self.db_path = new_path
+            self._initialize_database()
+            logger.info(f"Switched database to {new_path}")
+        except Exception as e:
+            logger.error(f"Failed to switch database: {e}")
+            raise
+
 
 # Global database manager instance
 db_manager = DatabaseManager()

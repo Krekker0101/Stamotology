@@ -4,11 +4,13 @@ Settings dialog UI for Laboratory Management System
 from PySide6.QtWidgets import (
     QDialog, QVBoxLayout, QHBoxLayout, QLabel, QLineEdit, 
     QComboBox, QPushButton, QMessageBox, QTabWidget, QWidget,
-    QTableWidget, QTableWidgetItem, QHeaderView
+    QTableWidget, QTableWidgetItem, QHeaderView, QFileDialog
 )
 from PySide6.QtCore import Qt
 from PySide6.QtGui import QFont
+from pathlib import Path
 import config
+from i18n import tr
 from models import User, UserRole
 from services.auth import auth_service
 from database import db_manager
@@ -26,7 +28,7 @@ class SettingsDialog(QDialog):
     
     def init_ui(self):
         """Initialize the UI"""
-        self.setWindowTitle("Настройки")
+        self.setWindowTitle(tr("settings"))
         self.setFixedSize(600, 500)
         
         layout = QVBoxLayout()
@@ -38,28 +40,33 @@ class SettingsDialog(QDialog):
         
         # Profile tab
         self.profile_tab = self.create_profile_tab()
-        self.tab_widget.addTab(self.profile_tab, "Профиль")
+        self.tab_widget.addTab(self.profile_tab, tr("profile"))
         
         # Users tab (admin only)
         if self.user.role == UserRole.ADMIN:
-            self.users_tab = self.create_users_tab()
-            self.tab_widget.addTab(self.users_tab, "Пользователи")
+           self.users_tab = self.create_users_tab()
+           self.tab_widget.addTab(self.users_tab, tr("users"))
         
         # Appearance tab
         self.appearance_tab = self.create_appearance_tab()
-        self.tab_widget.addTab(self.appearance_tab, "Внешний вид")
-        
+        self.tab_widget.addTab(self.appearance_tab, tr("appearance"))
+
+        # Database tab (admin only)
+        if self.user.role == UserRole.ADMIN:
+            self.database_tab = self.create_database_tab()
+            self.tab_widget.addTab(self.database_tab, "База данных")
+
         layout.addWidget(self.tab_widget)
         
         # Buttons
         button_layout = QHBoxLayout()
         
-        self.save_button = QPushButton("Сохранить")
+        self.save_button = QPushButton(tr("save"))
         self.save_button.setMinimumHeight(40)
         self.save_button.clicked.connect(self.save_settings)
         button_layout.addWidget(self.save_button)
         
-        self.close_button = QPushButton("Закрыть")
+        self.close_button = QPushButton(tr("close"))
         self.close_button.setMinimumHeight(40)
         self.close_button.clicked.connect(self.reject)
         button_layout.addWidget(self.close_button)
@@ -75,7 +82,7 @@ class SettingsDialog(QDialog):
         
         # Username (read-only)
         username_layout = QHBoxLayout()
-        username_label = QLabel("Имя пользователя:")
+        username_label = QLabel(tr("username") + ":")
         username_label.setFixedWidth(150)
         self.username_edit = QLineEdit()
         self.username_edit.setReadOnly(True)
@@ -85,7 +92,7 @@ class SettingsDialog(QDialog):
         
         # Full name
         name_layout = QHBoxLayout()
-        name_label = QLabel("Полное имя:")
+        name_label = QLabel(tr("full_name") + ":")
         name_label.setFixedWidth(150)
         self.full_name_edit = QLineEdit()
         name_layout.addWidget(name_label)
@@ -94,7 +101,7 @@ class SettingsDialog(QDialog):
         
         # Role (read-only)
         role_layout = QHBoxLayout()
-        role_label = QLabel("Роль:")
+        role_label = QLabel(tr("role") + ":")
         role_label.setFixedWidth(150)
         self.role_edit = QLineEdit()
         self.role_edit.setReadOnly(True)
@@ -103,13 +110,13 @@ class SettingsDialog(QDialog):
         layout.addLayout(role_layout)
         
         # Change password section
-        separator = QLabel("— Изменение пароля —")
+        separator = QLabel(tr("change_password_section"))
         separator.setAlignment(Qt.AlignmentFlag.AlignCenter)
         layout.addWidget(separator)
         
         # Current password
         current_password_layout = QHBoxLayout()
-        current_password_label = QLabel("Текущий пароль:")
+        current_password_label = QLabel(tr("current_password") + ":")
         current_password_label.setFixedWidth(150)
         self.current_password_edit = QLineEdit()
         self.current_password_edit.setEchoMode(QLineEdit.EchoMode.Password)
@@ -119,7 +126,7 @@ class SettingsDialog(QDialog):
         
         # New password
         new_password_layout = QHBoxLayout()
-        new_password_label = QLabel("Новый пароль:")
+        new_password_label = QLabel(tr("new_password") + ":")
         new_password_label.setFixedWidth(150)
         self.new_password_edit = QLineEdit()
         self.new_password_edit.setEchoMode(QLineEdit.EchoMode.Password)
@@ -129,7 +136,7 @@ class SettingsDialog(QDialog):
         
         # Confirm password
         confirm_password_layout = QHBoxLayout()
-        confirm_password_label = QLabel("Подтвердите пароль:")
+        confirm_password_label = QLabel(tr("confirm_password") + ":")
         confirm_password_label.setFixedWidth(150)
         self.confirm_password_edit = QLineEdit()
         self.confirm_password_edit.setEchoMode(QLineEdit.EchoMode.Password)
@@ -138,7 +145,7 @@ class SettingsDialog(QDialog):
         layout.addLayout(confirm_password_layout)
         
         # Change password button
-        self.change_password_button = QPushButton("Изменить пароль")
+        self.change_password_button = QPushButton(tr("change_password"))
         self.change_password_button.clicked.connect(self.change_password)
         layout.addWidget(self.change_password_button)
         
@@ -154,7 +161,7 @@ class SettingsDialog(QDialog):
         # Add user button
         button_layout = QHBoxLayout()
         
-        self.add_user_button = QPushButton("➕ Добавить пользователя")
+        self.add_user_button = QPushButton(tr("add_user"))
         self.add_user_button.clicked.connect(self.add_user)
         button_layout.addWidget(self.add_user_button)
         
@@ -183,8 +190,8 @@ class SettingsDialog(QDialog):
         theme_label = QLabel("Тема оформления:")
         theme_label.setFixedWidth(150)
         self.theme_combo = QComboBox()
-        self.theme_combo.addItem("Светлая", config.Theme.LIGHT)
-        self.theme_combo.addItem("Темная", config.Theme.DARK)
+        self.theme_combo.addItem(tr("theme_light"), config.Theme.LIGHT)
+        self.theme_combo.addItem(tr("theme_dark"), config.Theme.DARK)
         theme_layout.addWidget(theme_label)
         theme_layout.addWidget(self.theme_combo)
         layout.addLayout(theme_layout)
@@ -192,6 +199,70 @@ class SettingsDialog(QDialog):
         layout.addStretch()
         widget.setLayout(layout)
         return widget
+
+    def create_database_tab(self) -> QWidget:
+        """Create database settings tab (admin only)"""
+        widget = QWidget()
+        layout = QVBoxLayout()
+        layout.setSpacing(10)
+        
+        # Current DB path display
+        db_layout = QHBoxLayout()
+        db_label = QLabel(tr("current_db_file") + ":")
+        db_label.setFixedWidth(150)
+        self.db_path_edit = QLineEdit(str(config.config.DB_PATH))
+        self.db_path_edit.setReadOnly(True)
+        db_layout.addWidget(db_label)
+        db_layout.addWidget(self.db_path_edit)
+        layout.addLayout(db_layout)
+        
+        # Buttons: select, create, apply
+        button_layout = QHBoxLayout()
+        self.select_db_button = QPushButton(tr("select_db_file"))
+        self.select_db_button.clicked.connect(self.select_db_file)
+        button_layout.addWidget(self.select_db_button)
+        
+        self.create_db_button = QPushButton(tr("create_new_db"))
+        self.create_db_button.clicked.connect(self.create_new_db_file)
+        button_layout.addWidget(self.create_db_button)
+        
+        self.apply_db_button = QPushButton(tr("apply"))
+        self.apply_db_button.clicked.connect(self.apply_db_selection)
+        button_layout.addWidget(self.apply_db_button)
+        
+        layout.addLayout(button_layout)
+        layout.addStretch()
+        widget.setLayout(layout)
+        return widget
+
+    def select_db_file(self):
+        """Open file dialog to select an existing SQLite database file"""
+        path, _ = QFileDialog.getOpenFileName(self, "Выберите файл базы данных", str(config.config.DB_PATH.parent), "SQLite файлы (*.db);;Все файлы (*)")
+        if path:
+            self.db_path_edit.setText(path)
+            self._selected_db_path = Path(path)
+
+    def create_new_db_file(self):
+        """Open save dialog to create a new SQLite database file"""
+        path, _ = QFileDialog.getSaveFileName(self, "Создать новую базу данных", str(config.config.DB_PATH.parent / "new_database.db"), "SQLite файлы (*.db)")
+        if path:
+            self.db_path_edit.setText(path)
+            self._selected_db_path = Path(path)
+
+    def apply_db_selection(self):
+        """Apply the selected database: switch db manager and initialize if needed"""
+        if not hasattr(self, '_selected_db_path') or not self._selected_db_path:
+            QMessageBox.warning(self, "Ошибка", "Файл базы данных не выбран")
+            return
+        try:
+            from database import db_manager, init_db
+            # Switch database in db_manager (closes previous connection)
+            db_manager.switch_database(self._selected_db_path)
+            # Initialize new DB with default data if empty
+            init_db()
+            QMessageBox.information(self, "Успех", f"База данных переключена на {self._selected_db_path}")
+        except Exception as e:
+            QMessageBox.critical(self, "Ошибка", f"Не удалось переключить базу данных: {e}")
     
     def load_data(self):
         """Load current settings"""
@@ -287,10 +358,10 @@ class SettingsDialog(QDialog):
     
     def add_user(self):
         """Add new user (admin only)"""
-        from PySide6.QtWidgets import QDialogFormLayout, QDialog
+        from PySide6.QtWidgets import QDialog
         
         dialog = QDialog(self)
-        dialog.setWindowTitle("Добавить пользователя")
+        dialog.setWindowTitle(tr("create_user"))
         dialog.setFixedSize(400, 300)
         
         dialog_layout = QVBoxLayout()
@@ -329,8 +400,8 @@ class SettingsDialog(QDialog):
         
         # Buttons
         button_layout = QHBoxLayout()
-        save_button = QPushButton("Создать")
-        cancel_button = QPushButton("Отмена")
+        save_button = QPushButton(tr("create"))
+        cancel_button = QPushButton(tr("cancel"))
         
         def create_user():
             username = username_edit.text().strip()
