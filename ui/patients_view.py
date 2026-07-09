@@ -14,6 +14,7 @@ from services.patient import patient_service
 from services.export_import import export_import_service
 from ui.patient_dialog import PatientDialog
 from utils.helpers import format_date, get_unique_disease_types
+from i18n import tr
 
 
 class PatientsView(QWidget):
@@ -40,7 +41,7 @@ class PatientsView(QWidget):
         header_layout = QHBoxLayout()
         
         # Patient count label
-        self.count_label = QLabel("Всего пациентов: 0")
+        self.count_label = QLabel(tr("total_patients_count").format(count=0))
         count_font = QFont()
         count_font.setBold(True)
         self.count_label.setFont(count_font)
@@ -49,22 +50,22 @@ class PatientsView(QWidget):
         header_layout.addStretch()
         
         # Quick search
-        search_label = QLabel("Поиск:")
+        search_label = QLabel(tr("search") + ":")
         header_layout.addWidget(search_label)
         
         self.search_edit = QLineEdit()
-        self.search_edit.setPlaceholderText("Быстрый поиск...")
+        self.search_edit.setPlaceholderText(tr("quick_search_placeholder"))
         self.search_edit.setMaximumWidth(200)
         self.search_edit.textChanged.connect(self.handle_quick_search)
         header_layout.addWidget(self.search_edit)
         
         # Add patient button
-        add_button = QPushButton("➕ Добавить")
+        add_button = QPushButton(tr("add_patient"))
         add_button.clicked.connect(self.add_patient)
         header_layout.addWidget(add_button)
         
         # Export button
-        export_button = QPushButton("📤 Экспорт")
+        export_button = QPushButton(tr("export"))
         export_button.clicked.connect(self.export_data)
         header_layout.addWidget(export_button)
         
@@ -73,17 +74,17 @@ class PatientsView(QWidget):
         # Filter bar
         filter_layout = QHBoxLayout()
         
-        filter_layout.addWidget(QLabel("Фильтр по статусу:"))
+        filter_layout.addWidget(QLabel(tr("filter_by_status") + ":"))
         self.status_filter = QComboBox()
-        self.status_filter.addItem("Все статусы", None)
+        self.status_filter.addItem(tr("all_statuses"), None)
         for status in TreatmentStatus:
             self.status_filter.addItem(config.get_status_display(status), status)
         self.status_filter.currentIndexChanged.connect(self.apply_filters)
         filter_layout.addWidget(self.status_filter)
         
-        filter_layout.addWidget(QLabel("Тип заболевания:"))
+        filter_layout.addWidget(QLabel(tr("disease_type") + ":"))
         self.disease_filter = QComboBox()
-        self.disease_filter.addItem("Все типы", None)
+        self.disease_filter.addItem(tr("all_types"), None)
         self.load_disease_types()
         self.disease_filter.currentIndexChanged.connect(self.apply_filters)
         filter_layout.addWidget(self.disease_filter)
@@ -91,7 +92,7 @@ class PatientsView(QWidget):
         filter_layout.addStretch()
         
         # Sort
-        filter_layout.addWidget(QLabel("Сортировка:"))
+        filter_layout.addWidget(QLabel(tr("sort") + ":"))
         self.sort_combo = QComboBox()
         self.sort_combo.addItems([
             "ID (по возрастанию)",
@@ -112,8 +113,8 @@ class PatientsView(QWidget):
         self.table = QTableWidget()
         self.table.setColumnCount(8)
         self.table.setHorizontalHeaderLabels([
-            "ID", "ФИО", "Телефон", "Год рождения", 
-            "Тип заболевания", "Заболевание", "Статус", "Дата регистрации"
+           tr("hdr_id"), tr("hdr_full_name"), tr("hdr_phone"), tr("hdr_birth_year"),
+           tr("hdr_disease_type"), tr("hdr_disease_name"), tr("hdr_status"), tr("hdr_registration_date")
         ])
         self.table.horizontalHeader().setSectionResizeMode(QHeaderView.ResizeMode.Stretch)
         self.table.verticalHeader().setVisible(False)
@@ -133,7 +134,7 @@ class PatientsView(QWidget):
         self.prev_button.clicked.connect(self.prev_page)
         pagination_layout.addWidget(self.prev_button)
         
-        self.page_label = QLabel("Страница 1 из 1")
+        self.page_label = QLabel(tr("page_label").format(current=1, total=1))
         self.page_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
         pagination_layout.addWidget(self.page_label)
         
@@ -148,7 +149,7 @@ class PatientsView(QWidget):
         pagination_layout.addStretch()
         
         # Page size
-        pagination_layout.addWidget(QLabel("На странице:"))
+        pagination_layout.addWidget(QLabel(tr("per_page")))
         self.page_size_combo = QComboBox()
         self.page_size_combo.addItems(["25", "50", "100", "200"])
         self.page_size_combo.setCurrentText(str(config.config.PAGE_SIZE))

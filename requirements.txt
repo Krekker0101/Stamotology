@@ -5,3 +5,4 @@ reportlab==4.2.5
 bcrypt==4.2.1
 matplotlib==3.10.0
 pandas==2.2.3
+seaborn==0.13.2

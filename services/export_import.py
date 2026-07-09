@@ -4,12 +4,15 @@ Handles exporting data to Excel, PDF, CSV and importing from Excel, CSV
 """
 import logging
 from pathlib import Path
-from typing import Tuple, List
+from typing import Tuple, List, Dict
 import pandas as pd
 from datetime import datetime
 from database import db_manager
 from models import Patient, TreatmentStatus, Gender
 from config import config
+from services.statistics import statistics_service
+import tempfile
+from PIL import Image as PILImage
 
 
 logger = logging.getLogger(__name__)
