@@ -6,7 +6,8 @@ from PySide6.QtWidgets import (
     QLabel, QStackedWidget, QFrame, QMessageBox
 )
 from PySide6.QtCore import Qt, Signal
-from PySide6.QtGui import QFont
+from PySide6.QtGui import QFont, QPixmap
+from pathlib import Path
 import config
 from models import User, UserRole
 from ui.patients_view import PatientsView
@@ -73,31 +74,53 @@ class MainWindow(QMainWindow):
         sidebar.setFixedWidth(250)
         
         layout = QVBoxLayout()
-        layout.setSpacing(5)
+        layout.setSpacing(10)
         layout.setContentsMargins(10, 10, 10, 10)
         
-        # App title
-        title_label = QLabel("Лаборатория")
-        title_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        title_font = QFont()
-        title_font.setPointSize(18)
-        title_font.setBold(True)
-        title_label.setFont(title_font)
-        layout.addWidget(title_label)
+        # Logo and branding header
+        header_layout = QHBoxLayout()
+        header_layout.setSpacing(10)
+        header_layout.setContentsMargins(0, 0, 0, 0)
+        
+        # Logo
+        logo_path = Path(__file__).parent.parent / "img" / "logo.jpg"
+        if logo_path.exists():
+            logo_label = QLabel()
+            pixmap = QPixmap(str(logo_path))
+            scaled_pixmap = pixmap.scaledToHeight(50, Qt.TransformationMode.SmoothTransformation)
+            logo_label.setPixmap(scaled_pixmap)
+            header_layout.addWidget(logo_label)
+        
+        # App name branding
+        branding_label = QLabel("Stamotology")
+        branding_font = QFont("Segoe UI", 15)
+        branding_font.setBold(True)
+        branding_font.setLetterSpacing(QFont.PercentageSpacing, 105)
+        branding_label.setFont(branding_font)
+        branding_label.setAlignment(Qt.AlignmentFlag.AlignVCenter)
+        header_layout.addWidget(branding_label, 1)
+        
+        layout.addLayout(header_layout)
+        
+        # Separator
+        separator = QFrame()
+        separator.setFrameShape(QFrame.Shape.HLine)
+        separator.setFrameShadow(QFrame.Shadow.Sunken)
+        layout.addWidget(separator)
         
         # User info
-        user_label = QLabel(f"Пользователь: {self.current_user.full_name}")
+        user_label = QLabel(f"👤 {self.current_user.full_name}")
         user_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
         user_font = QFont()
-        user_font.setPointSize(10)
+        user_font.setPointSize(9)
         user_label.setFont(user_font)
         layout.addWidget(user_label)
         
         # Role badge
         role_text = {
-            UserRole.ADMIN: "Администратор",
-            UserRole.DOCTOR: "Врач",
-            UserRole.RECEPTIONIST: "Регистратор"
+            UserRole.ADMIN: "🔐 Администратор",
+            UserRole.DOCTOR: "👨‍⚕️ Врач",
+            UserRole.RECEPTIONIST: "📞 Регистратор"
         }
         role_label = QLabel(role_text.get(self.current_user.role, ""))
         role_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
@@ -250,7 +273,8 @@ class MainWindow(QMainWindow):
                 background-color: {colors['background']};
             }}
             QFrame {{
-                background-color: {colors['surface']};
+                background-color: {colors['background']};
+                color: {colors['text']};
             }}
             QLabel {{
                 color: {colors['text']};
@@ -263,7 +287,10 @@ class MainWindow(QMainWindow):
                 border-radius: 5px;
                 text-align: left;
                 padding-left: 15px;
-                font-size: 13px;
+                padding-right: 15px;
+                font-size: 12px;
+                font-weight: 500;
+                margin: 2px;
             }}
             QPushButton:hover {{
                 background-color: {colors['border']};
@@ -271,6 +298,7 @@ class MainWindow(QMainWindow):
             QPushButton[active="true"] {{
                 background-color: {colors['primary']};
                 color: white;
+                font-weight: bold;
             }}
             QPushButton[active="true"]:hover {{
                 background-color: {colors['primary_hover']};
