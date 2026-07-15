@@ -2,7 +2,7 @@
 Database module for Laboratory Management System
 Handles database connection and session management
 """
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, event, text
 from sqlalchemy.orm import sessionmaker, scoped_session
 from contextlib import contextmanager
 import logging
@@ -54,6 +54,8 @@ class DatabaseManager:
                 max_overflow=10
             )
             
+            self._configure_sqlite_pragmas()
+
             # Create session factory
             self.SessionLocal = scoped_session(
                 sessionmaker(
@@ -63,8 +65,9 @@ class DatabaseManager:
                 )
             )
             
-            # Create tables
+            # Create tables and indexes
             self.create_tables()
+            self._run_lightweight_migrations()
             
             logger.info(f"Database initialized at {self.db_path}")
             
@@ -72,6 +75,39 @@ class DatabaseManager:
             logger.error(f"Failed to initialize database: {e}")
             raise
     
+    def _configure_sqlite_pragmas(self):
+        """Apply SQLite pragmas that improve durability and UI responsiveness."""
+        if not self.engine:
+            return
+
+        @event.listens_for(self.engine, "connect")
+        def set_sqlite_pragma(dbapi_connection, _connection_record):
+            cursor = dbapi_connection.cursor()
+            cursor.execute("PRAGMA journal_mode=WAL")
+            cursor.execute("PRAGMA synchronous=NORMAL")
+            cursor.execute("PRAGMA temp_store=MEMORY")
+            cursor.execute("PRAGMA foreign_keys=ON")
+            cursor.execute("PRAGMA busy_timeout=30000")
+            cursor.execute("PRAGMA cache_size=-16000")
+            cursor.close()
+
+    def _run_lightweight_migrations(self):
+        """Create performance indexes for existing SQLite databases."""
+        if not self.engine:
+            return
+
+        index_statements = (
+            "CREATE INDEX IF NOT EXISTS idx_patients_search_core ON patients (full_name, phone, disease_name, disease_type)",
+            "CREATE INDEX IF NOT EXISTS idx_patients_status_date ON patients (treatment_status, registration_date)",
+            "CREATE INDEX IF NOT EXISTS idx_patients_doctor ON patients (treating_doctor)",
+            "CREATE INDEX IF NOT EXISTS idx_attachments_patient ON attachments (patient_id)",
+            "CREATE INDEX IF NOT EXISTS idx_action_logs_patient_time ON action_logs (patient_id, timestamp)",
+            "CREATE INDEX IF NOT EXISTS idx_reminders_patient_date ON reminders (patient_id, reminder_date)",
+        )
+        with self.engine.begin() as connection:
+            for statement in index_statements:
+                connection.execute(text(statement))
+
     def create_tables(self):
         """Create all tables in the database"""
         try:

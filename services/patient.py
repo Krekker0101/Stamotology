@@ -98,8 +98,16 @@ class PatientService:
             with db_manager.session_scope(expire_on_commit=False) as session:
                 query = session.query(Patient)
                 
-                # Apply sorting
-                sort_column = getattr(Patient, sort_by, Patient.id)
+                allowed_sort_columns = {
+                    'id': Patient.id,
+                    'full_name': Patient.full_name,
+                    'registration_date': Patient.registration_date,
+                    'birth_year': Patient.birth_year,
+                    'treatment_status': Patient.treatment_status,
+                }
+
+                # Apply sorting with an allow-list to avoid accidental unsafe attributes
+                sort_column = allowed_sort_columns.get(sort_by, Patient.id)
                 if sort_order == 'desc':
                     sort_column = sort_column.desc()
                 else:
@@ -107,6 +115,8 @@ class PatientService:
                 
                 query = query.order_by(sort_column)
                 
+                query = query.order_by(Patient.registration_date.desc(), Patient.id.desc())
+
                 # Get total count
                 total_count = query.count()
                 
