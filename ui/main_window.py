@@ -29,8 +29,18 @@ from services.patient import patient_service
 
 
 def get_resource_path(relative_path: str) -> Path:
-    """Resolve bundled resources in both development and PyInstaller builds."""
-    base_path = Path(getattr(sys, "_MEIPASS", Path(__file__).parent))
+    """Resolve bundled resources in both development and PyInstaller builds.
+
+    In development this file lives in ``ui/``, while assets live in the project
+    root (e.g. ``img/logo.gif``). When frozen by PyInstaller, ``_MEIPASS`` points
+    at the bundle root where ``img/`` is also placed, so the same relative path
+    works for both cases.
+    """
+    if getattr(sys, "frozen", False):
+        base_path = Path(getattr(sys, "_MEIPASS", Path(__file__).parent))
+    else:
+        # __file__ is ui/main_window.py -> project root is the parent directory.
+        base_path = Path(__file__).resolve().parent.parent
     return base_path / relative_path
 
 
@@ -241,7 +251,7 @@ class MainWindow(QMainWindow):
         """Create the compact app brand area used in the sidebar."""
         header = QFrame()
         header.setObjectName("brandHeader")
-        header.setFixedHeight(68)
+        header.setFixedHeight(72)
 
         header_layout = QHBoxLayout(header)
         header_layout.setSpacing(12)
@@ -249,7 +259,7 @@ class MainWindow(QMainWindow):
 
         icon_frame = QFrame()
         icon_frame.setObjectName("brandIconFrame")
-        icon_frame.setFixedSize(52, 52)
+        icon_frame.setFixedSize(64, 64)
 
         shadow = QGraphicsDropShadowEffect(icon_frame)
         shadow.setBlurRadius(18)
@@ -258,19 +268,20 @@ class MainWindow(QMainWindow):
         icon_frame.setGraphicsEffect(shadow)
 
         icon_layout = QVBoxLayout(icon_frame)
-        icon_layout.setContentsMargins(8, 8, 8, 8)
+        icon_layout.setContentsMargins(2, 2, 2, 2)
 
         # Animated brand icon: continuously looping logo.gif that replaces the
         # static logo while preserving size, spacing and shadow.
+        # Kept square (matching the source GIF) to avoid stretching/pixelation.
         logo_label = QLabel()
         logo_label.setObjectName("brandIcon")
-        logo_label.setFixedSize(36, 36)
+        logo_label.setFixedSize(60, 60)
         logo_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
         logo_label.setStyleSheet("background: transparent;")
 
         self._brand_movie = QMovie(str(get_resource_path("img/logo.gif")))
         self._brand_movie.setCacheMode(QMovie.CacheMode.CacheAll)
-        self._brand_movie.setScaledSize(QSize(36, 36))
+        self._brand_movie.setScaledSize(QSize(60, 60))
         logo_label.setMovie(self._brand_movie)
         self._brand_movie.start()
 

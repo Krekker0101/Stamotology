@@ -2,6 +2,7 @@
 ; This script creates a completely standalone Windows installer
 ; No external dependencies required - everything is included
 
+#define AppName "Stamotology"
 #define AppName "Стоматология"
 #define AppVersion "1.0.0"
 #define AppPublisher "Krekker0101"
@@ -28,9 +29,7 @@ DisableProgramGroupPage=no
 DisableReadyPage=yes
 DisableWelcomePage=no
 AlwaysShowDirOnReadyPage=yes
-AlwaysShowGroupOnReadyPage=yes
-ShowLanguageDialog=no
-AppCopyright=Copyright © 2026 {#AppPublisher}
+@@ -34,56 +34,57 @@ AppCopyright=Copyright © 2026 {#AppPublisher}
 AppComments=Professional Medical Desktop System
 AppContact=
 ; No external dependencies
@@ -56,11 +55,14 @@ Source: "dist\{#AppExeName}"; DestDir: "{app}"; Flags: ignoreversion
 Source: "img\logo.png"; DestDir: "{app}\img"; Flags: ignoreversion
 Source: "img\logo.ico"; DestDir: "{app}\img"; Flags: ignoreversion
 Source: "img\logo.svg"; DestDir: "{app}\img"; Flags: ignoreversion
+Source: "img\logo.gif"; DestDir: "{app}\img"; Flags: ignoreversion
 
 [Icons]
 ; Start menu shortcut
+Name: "{group}\{#AppName}"; Filename: "{app}\{#AppExeName}"; IconFilename: "{app}\img\logo.ico"; Comment: "Stamotology"
 Name: "{group}\{#AppName}"; Filename: "{app}\{#AppExeName}"; IconFilename: "{app}\img\logo.ico"; Comment: "Стоматология"
 ; Desktop shortcut
+Name: "{autodesktop}\{#AppName}"; Filename: "{app}\{#AppExeName}"; IconFilename: "{app}\img\logo.ico"; Tasks: desktopicon; Comment: "Stamotology"
 Name: "{autodesktop}\{#AppName}"; Filename: "{app}\{#AppExeName}"; IconFilename: "{app}\img\logo.ico"; Tasks: desktopicon; Comment: "Стоматология"
 ; Quick launch shortcut (Windows 7 and below)
 Name: "{userappdata}\Microsoft\Internet Explorer\Quick Launch\{#AppName}"; Filename: "{app}\{#AppExeName}"; IconFilename: "{app}\img\logo.ico"; Tasks: quicklaunchicon
@@ -87,11 +89,3 @@ begin
     // Create additional directories if needed
     if not DirExists(ExpandConstant('{app}\data')) then
       CreateDir(ExpandConstant('{app}\data'));
-    if not DirExists(ExpandConstant('{app}\backups')) then
-      CreateDir(ExpandConstant('{app}\backups'));
-    if not DirExists(ExpandConstant('{app}\reports')) then
-      CreateDir(ExpandConstant('{app}\reports'));
-    if not DirExists(ExpandConstant('{app}\files')) then
-      CreateDir(ExpandConstant('{app}\files'));
-  end;
-end;

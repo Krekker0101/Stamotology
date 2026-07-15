@@ -49,7 +49,7 @@ def tr(key: str, **kwargs) -> str:
             "total_patients_count": "Всего пациентов: {count}",
             "search": "Поиск",
             "quick_search_placeholder": "Быстрый поиск...",
-            "add_patient": "➕ Добавить | Илова",
+            "add_patient": " Добавить | Илова",
             "export": "📤 Экспорт | Содирот",
             "filter_by_status": "Фильтр по статусу",
             "disease_type": "Тип заболевания",

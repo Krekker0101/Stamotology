@@ -70,8 +70,8 @@ class AppConfig:
         self.FILES_DIR.mkdir(parents=True, exist_ok=True)
     
     # Application
-    APP_NAME: str = "Стоматология"
-    APP_VERSION: str = "1.0.0"
+    APP_NAME: str = "Стамотология | Дандонпизишкӣ"
+    APP_VERSION: str = "1.1.0"
     
     # UI
     WINDOW_WIDTH: int = 1400
