@@ -21,12 +21,12 @@ class UserRole(enum.Enum):
 
 
 class TreatmentStatus(enum.Enum):
-    IN_PROGRESS = "in_progress"
-    CURED = "cured"
-    TREATMENT_COMPLETED = "treatment_completed"
-    NOT_CURED = "not_cured"
-    REFUSED = "refused"
-    NO_CHANGE = "no_change"
+    IN_PROGRESS = "в_процессе_лечения"
+    CURED = "вылечен"
+    TREATMENT_COMPLETED = "лечение_завершено"
+    NOT_CURED = "не_удалось_вылечить"
+    REFUSED = "отказался_от_лечения"
+    NO_CHANGE = "без_изменений"
 
 
 class Gender(enum.Enum):

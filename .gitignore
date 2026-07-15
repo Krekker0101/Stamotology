@@ -1,0 +1,41 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+env/
+
+# PyInstaller build artifacts
+build/
+dist/
+*.spec.bak
+warn-*.txt
+xref-*.html
+
+# Compiled executables
+*.exe
+*.pkg
+*.zip
+
+# Database (regenerated on first run)
+*.db
+data/*.db
+
+# Logs
+*.log
+app.log
+
+# Generated reports / exports
+*.pdf
+*.xlsx
+*.csv
+
+# Backups (generated at runtime)
+backups/
+
+# OS / editor
+.DS_Store
+Thumbs.db
+*.swp
+.vscode/

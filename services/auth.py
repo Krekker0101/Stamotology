@@ -196,11 +196,14 @@ class AuthService:
             return []
     
     @staticmethod
-    def update_user(user_id: int, full_name: str = None, 
-                   role: UserRole = None, is_active: bool = None) -> Tuple[bool, str]:
+    def update_user(user_id: int, data: dict = None) -> Tuple[bool, str]:
         """
         Update user information
         
+        Args:
+            user_id: ID of user to update
+            data: Dictionary with fields to update (full_name, role, is_active)
+            
         Returns:
             Tuple of (success, message)
         """
@@ -211,12 +214,13 @@ class AuthService:
                 if not user:
                     return False, "Пользователь не найден"
                 
-                if full_name is not None:
-                    user.full_name = full_name
-                if role is not None:
-                    user.role = role
-                if is_active is not None:
-                    user.is_active = is_active
+                if data:
+                    if 'full_name' in data and data['full_name'] is not None:
+                        user.full_name = data['full_name']
+                    if 'role' in data and data['role'] is not None:
+                        user.role = data['role']
+                    if 'is_active' in data and data['is_active'] is not None:
+                        user.is_active = data['is_active']
                 
                 logger.info(f"User {user.username} updated successfully")
                 return True, "Пользователь обновлен успешно"

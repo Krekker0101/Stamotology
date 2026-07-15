@@ -9,6 +9,7 @@ from PySide6.QtWidgets import (
 from PySide6.QtCore import Qt
 from PySide6.QtGui import QFont
 import config
+from config import get_status_display, get_status_color
 from models import Patient, TreatmentStatus
 from services.patient import patient_service
 from services.export_import import export_import_service
@@ -78,7 +79,7 @@ class PatientsView(QWidget):
         self.status_filter = QComboBox()
         self.status_filter.addItem(tr("all_statuses"), None)
         for status in TreatmentStatus:
-            self.status_filter.addItem(config.get_status_display(status), status)
+            self.status_filter.addItem(get_status_display(status), status)
         self.status_filter.currentIndexChanged.connect(self.apply_filters)
         filter_layout.addWidget(self.status_filter)
         
@@ -95,14 +96,14 @@ class PatientsView(QWidget):
         filter_layout.addWidget(QLabel(tr("sort") + ":"))
         self.sort_combo = QComboBox()
         self.sort_combo.addItems([
-            "ID (по возрастанию)",
-            "ID (по убыванию)",
-            "ФИО (А-Я)",
-            "ФИО (Я-А)",
-            "Дата регистрации (новые)",
-            "Дата регистрации (старые)",
-            "Год рождения",
-            "Статус"
+            tr("sort_by_id_asc"),
+            tr("sort_by_id_desc"),
+            tr("sort_by_name_asc"),
+            tr("sort_by_name_desc"),
+            tr("sort_by_date_new"),
+            tr("sort_by_date_old"),
+            tr("sort_by_birth_year"),
+            tr("sort_by_status")
         ])
         self.sort_combo.currentIndexChanged.connect(self.apply_sort)
         filter_layout.addWidget(self.sort_combo)
@@ -164,7 +165,7 @@ class PatientsView(QWidget):
         """Load disease types for filter"""
         types = get_unique_disease_types()
         self.disease_filter.clear()
-        self.disease_filter.addItem("Все типы", None)
+        self.disease_filter.addItem(tr("all_types"), None)
         for dtype in types:
             self.disease_filter.addItem(dtype, dtype)
     
@@ -201,7 +202,7 @@ class PatientsView(QWidget):
         
         # Update total count
         self.total_pages = (self.total_count + page_size - 1) // page_size if self.total_count > 0 else 1
-        self.count_label.setText(f"Всего пациентов: {self.total_count}")
+        self.count_label.setText(tr("total_patients_count").format(count=self.total_count))
         
         # Update table
         self.update_table()
@@ -235,8 +236,8 @@ class PatientsView(QWidget):
             self.table.setItem(row, 5, QTableWidgetItem(patient.disease_name))
             
             # Status
-            status_item = QTableWidgetItem(config.get_status_display(patient.treatment_status))
-            status_color = config.get_status_color(patient.treatment_status)
+            status_item = QTableWidgetItem(get_status_display(patient.treatment_status))
+            status_color = get_status_color(patient.treatment_status)
             status_item.setBackground(Qt.GlobalColor.transparent if status_color == "#9E9E9E" else Qt.GlobalColor.transparent)
             self.table.setItem(row, 6, status_item)
             
@@ -245,7 +246,7 @@ class PatientsView(QWidget):
     
     def update_pagination(self):
         """Update pagination controls"""
-        self.page_label.setText(f"Страница {self.current_page} из {self.total_pages}")
+        self.page_label.setText(tr("page_label").format(current=self.current_page, total=self.total_pages))
         
         self.first_button.setEnabled(self.current_page > 1)
         self.prev_button.setEnabled(self.current_page > 1)
@@ -335,16 +336,15 @@ class PatientsView(QWidget):
         """Delete selected patient"""
         current_row = self.table.currentRow()
         if current_row < 0:
-            QMessageBox.warning(self, "Предупреждение", "Выберите пациента для удаления")
+            QMessageBox.warning(self, tr("warning"), tr("select_patient"))
             return
         
         patient_id = self.table.item(current_row, 0).data(Qt.ItemDataRole.UserRole)
         patient_name = self.table.item(current_row, 1).text()
         
         reply = QMessageBox.question(
-            self, "Подтверждение удаления",
-            f"Вы уверены, что хотите удалить пациента '{patient_name}'?\n\n"
-            "Это действие нельзя отменить.",
+            self, tr("confirm_delete"),
+            tr("confirm_delete_patient").format(name=patient_name) + "\n\n" + tr("cannot_undo"),
             QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No
         )
         
@@ -352,9 +352,9 @@ class PatientsView(QWidget):
             success, message = patient_service.delete_patient(patient_id, self.user.id)
             if success:
                 self.load_data()
-                QMessageBox.information(self, "Успех", message)
+                QMessageBox.information(self, tr("success"), message)
             else:
-                QMessageBox.critical(self, "Ошибка", message)
+                QMessageBox.critical(self, tr("error"), message)
     
     def export_data(self):
         """Export patient data"""
@@ -383,13 +383,13 @@ class PatientsView(QWidget):
             elif file_ext == 'pdf':
                 success, message = export_import_service.export_to_pdf(file_path, filters)
             else:
-                QMessageBox.warning(self, "Ошибка", "Неподдерживаемый формат файла")
+                QMessageBox.warning(self, tr("error"), tr("unsupported_format"))
                 return
             
             if success:
-                QMessageBox.information(self, "Успех", message)
+                QMessageBox.information(self, tr("success"), message)
             else:
-                QMessageBox.critical(self, "Ошибка", message)
+                QMessageBox.critical(self, tr("error"), message)
     
     def apply_theme(self, theme):
         """Apply theme to the view"""
@@ -447,3 +447,43 @@ class PatientsView(QWidget):
                 color: {colors['text_secondary']};
             }}
         """)
+    
+    def update_language(self):
+        """Update UI language"""
+        # Update labels and buttons
+        self.count_label.setText(tr("total_patients_count").format(count=self.total_count))
+        
+        # Update sort combo
+        current_sort = self.sort_combo.currentIndex()
+        self.sort_combo.clear()
+        self.sort_combo.addItems([
+            tr("sort_by_id_asc"),
+            tr("sort_by_id_desc"),
+            tr("sort_by_name_asc"),
+            tr("sort_by_name_desc"),
+            tr("sort_by_date_new"),
+            tr("sort_by_date_old"),
+            tr("sort_by_birth_year"),
+            tr("sort_by_status")
+        ])
+        self.sort_combo.setCurrentIndex(current_sort)
+        
+        # Update table headers
+        self.table.setHorizontalHeaderLabels([
+           tr("hdr_id"), tr("hdr_full_name"), tr("hdr_phone"), tr("hdr_birth_year"),
+           tr("hdr_disease_type"), tr("hdr_disease_name"), tr("hdr_status"), tr("hdr_registration_date")
+        ])
+        
+        # Update pagination
+        self.page_label.setText(tr("page_label").format(current=self.current_page, total=self.total_pages))
+        
+        # Reload disease types with translated "all types"
+        self.load_disease_types()
+        
+        # Update status filter
+        current_status = self.status_filter.currentIndex()
+        self.status_filter.clear()
+        self.status_filter.addItem(tr("all_statuses"), None)
+        for status in TreatmentStatus:
+            self.status_filter.addItem(get_status_display(status), status)
+        self.status_filter.setCurrentIndex(current_status)

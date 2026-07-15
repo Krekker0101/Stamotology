@@ -9,10 +9,12 @@ from PySide6.QtWidgets import (
 from PySide6.QtCore import Qt
 from PySide6.QtGui import QFont
 import config
+from config import get_status_display
 from models import TreatmentStatus
 from services.patient import patient_service
 from ui.patient_dialog import PatientDialog
 from utils.helpers import format_date, get_unique_disease_types
+from i18n import tr
 
 
 class SearchView(QWidget):
@@ -31,7 +33,7 @@ class SearchView(QWidget):
         layout.setContentsMargins(15, 15, 15, 15)
         
         # Title
-        title_label = QLabel("🔍 Расширенный поиск")
+        title_label = QLabel(f"🔍 {tr('advanced_search')}")
         title_font = QFont()
         title_font.setPointSize(16)
         title_font.setBold(True)
@@ -43,39 +45,39 @@ class SearchView(QWidget):
         
         # Name/Phone/ID search
         general_layout = QHBoxLayout()
-        general_layout.addWidget(QLabel("ФИО / Телефон / ID:"))
+        general_layout.addWidget(QLabel(tr("name_phone_id")))
         self.general_search = QLineEdit()
-        self.general_search.setPlaceholderText("Введите для поиска...")
+        self.general_search.setPlaceholderText(tr("enter_search"))
         general_layout.addWidget(self.general_search)
         search_layout.addLayout(general_layout)
         
         # Disease search
         disease_layout = QHBoxLayout()
-        disease_layout.addWidget(QLabel("Заболевание:"))
+        disease_layout.addWidget(QLabel(tr("disease")))
         self.disease_search = QLineEdit()
-        self.disease_search.setPlaceholderText("Название заболевания")
+        self.disease_search.setPlaceholderText(tr("disease_name_placeholder"))
         disease_layout.addWidget(self.disease_search)
         search_layout.addLayout(disease_layout)
         
         # Filters row
         filter_row = QHBoxLayout()
         
-        filter_row.addWidget(QLabel("Статус:"))
+        filter_row.addWidget(QLabel(tr("status") + ":"))
         self.status_filter = QComboBox()
-        self.status_filter.addItem("Все статусы", None)
+        self.status_filter.addItem(tr("all_statuses"), None)
         for status in TreatmentStatus:
-            self.status_filter.addItem(config.get_status_display(status), status)
+            self.status_filter.addItem(get_status_display(status), status)
         filter_row.addWidget(self.status_filter)
         
-        filter_row.addWidget(QLabel("Тип заболевания:"))
+        filter_row.addWidget(QLabel(tr("disease_type") + ":"))
         self.disease_type_filter = QComboBox()
-        self.disease_type_filter.addItem("Все типы", None)
+        self.disease_type_filter.addItem(tr("all_types"), None)
         self.load_disease_types()
         filter_row.addWidget(self.disease_type_filter)
         
-        filter_row.addWidget(QLabel("Год рождения:"))
+        filter_row.addWidget(QLabel(tr("birth_year") + ":"))
         self.birth_year_filter = QLineEdit()
-        self.birth_year_filter.setPlaceholderText("Год")
+        self.birth_year_filter.setPlaceholderText(tr("year"))
         self.birth_year_filter.setMaximumWidth(80)
         filter_row.addWidget(self.birth_year_filter)
         
@@ -85,12 +87,12 @@ class SearchView(QWidget):
         # Search button
         button_layout = QHBoxLayout()
         
-        self.search_button = QPushButton("🔎 Найти")
+        self.search_button = QPushButton(f"🔎 {tr('find')}")
         self.search_button.setMinimumHeight(40)
         self.search_button.clicked.connect(self.perform_search)
         button_layout.addWidget(self.search_button)
         
-        self.clear_button = QPushButton("🗑️ Очистить")
+        self.clear_button = QPushButton(f"🗑️ {tr('clear')}")
         self.clear_button.setMinimumHeight(40)
         self.clear_button.clicked.connect(self.clear_search)
         button_layout.addWidget(self.clear_button)
@@ -99,7 +101,7 @@ class SearchView(QWidget):
         layout.addLayout(button_layout)
         
         # Results label
-        self.results_label = QLabel("Результаты: 0")
+        self.results_label = QLabel(f"{tr('results')}: 0")
         results_font = QFont()
         results_font.setBold(True)
         self.results_label.setFont(results_font)
@@ -109,8 +111,8 @@ class SearchView(QWidget):
         self.table = QTableWidget()
         self.table.setColumnCount(8)
         self.table.setHorizontalHeaderLabels([
-            "ID", "ФИО", "Телефон", "Год рождения", 
-            "Тип заболевания", "Заболевание", "Статус", "Дата регистрации"
+            tr("hdr_id"), tr("hdr_full_name"), tr("hdr_phone"), tr("hdr_birth_year"), 
+            tr("hdr_disease_type"), tr("hdr_disease_name"), tr("hdr_status"), tr("hdr_registration_date")
         ])
         self.table.horizontalHeader().setSectionResizeMode(QHeaderView.ResizeMode.Stretch)
         self.table.verticalHeader().setVisible(False)
@@ -125,7 +127,7 @@ class SearchView(QWidget):
         """Load disease types for filter"""
         types = get_unique_disease_types()
         self.disease_type_filter.clear()
-        self.disease_type_filter.addItem("Все типы", None)
+        self.disease_type_filter.addItem(tr("all_types"), None)
         for dtype in types:
             self.disease_type_filter.addItem(dtype, dtype)
     
@@ -170,7 +172,7 @@ class SearchView(QWidget):
             search_term, filters, page=1, page_size=1000
         )
         
-        self.results_label.setText(f"Результаты: {total_count}")
+        self.results_label.setText(f"{tr('results')}: {total_count}")
         self.update_table()
     
     def clear_search(self):
@@ -181,7 +183,7 @@ class SearchView(QWidget):
         self.disease_type_filter.setCurrentIndex(0)
         self.birth_year_filter.clear()
         self.patients = []
-        self.results_label.setText("Результаты: 0")
+        self.results_label.setText(f"{tr('results')}: 0")
         self.update_table()
     
     def update_table(self):
@@ -210,7 +212,7 @@ class SearchView(QWidget):
             self.table.setItem(row, 5, QTableWidgetItem(patient.disease_name))
             
             # Status
-            status_item = QTableWidgetItem(config.get_status_display(patient.treatment_status))
+            status_item = QTableWidgetItem(get_status_display(patient.treatment_status))
             self.table.setItem(row, 6, status_item)
             
             # Registration date
@@ -282,3 +284,37 @@ class SearchView(QWidget):
                 background-color: {colors['primary_hover']};
             }}
         """)
+    
+    def update_language(self):
+        """Update UI language"""
+        # Update title
+        # Find title label and update
+        for i in range(self.layout().count()):
+            widget = self.layout().itemAt(i).widget()
+            if isinstance(widget, QLabel) and "🔍" in widget.text():
+                widget.setText(f"🔍 {tr('advanced_search')}")
+                break
+        
+        # Update buttons
+        self.search_button.setText(f"🔎 {tr('find')}")
+        self.clear_button.setText(f"🗑️ {tr('clear')}")
+        
+        # Update results label
+        self.results_label.setText(f"{tr('results')}: {len(self.patients)}")
+        
+        # Update table headers
+        self.table.setHorizontalHeaderLabels([
+            tr("hdr_id"), tr("hdr_full_name"), tr("hdr_phone"), tr("hdr_birth_year"), 
+            tr("hdr_disease_type"), tr("hdr_disease_name"), tr("hdr_status"), tr("hdr_registration_date")
+        ])
+        
+        # Update filters
+        current_status = self.status_filter.currentIndex()
+        self.status_filter.clear()
+        self.status_filter.addItem(tr("all_statuses"), None)
+        for status in TreatmentStatus:
+            self.status_filter.addItem(get_status_display(status), status)
+        self.status_filter.setCurrentIndex(current_status)
+        
+        # Update disease types
+        self.load_disease_types()

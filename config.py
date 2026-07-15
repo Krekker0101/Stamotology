@@ -2,6 +2,7 @@
 Configuration module for Laboratory Management System
 """
 import os
+import sys
 from pathlib import Path
 from dataclasses import dataclass
 from enum import Enum
@@ -24,21 +25,49 @@ class UserRole(Enum):
 
 
 class TreatmentStatus(Enum):
-    IN_PROGRESS = "in_progress"
-    CURED = "cured"
-    TREATMENT_COMPLETED = "treatment_completed"
-    NOT_CURED = "not_cured"
-    REFUSED = "refused"
-    NO_CHANGE = "no_change"
+    IN_PROGRESS = "в_процессе_лечения"
+    CURED = "вылечен"
+    TREATMENT_COMPLETED = "лечение_завершено"
+    NOT_CURED = "не_удалось_вылечить"
+    REFUSED = "отказался_от_лечения"
+    NO_CHANGE = "без_изменений"
+
+
+def get_base_path() -> Path:
+    """Get the base path for the application (works for both dev and exe)"""
+    if getattr(sys, 'frozen', False):
+        # Running as compiled exe
+        return Path(sys.executable).parent
+    else:
+        # Running in development
+        return Path(__file__).parent
 
 
 @dataclass
 class AppConfig:
     """Application configuration"""
     
+    # Base path
+    BASE_PATH: Path = get_base_path()
+    
     # Database
     DB_NAME: str = "laboratory.db"
-    DB_PATH: Path = Path(__file__).parent / DB_NAME
+    DATA_DIR: Path = None
+    
+    def __post_init__(self):
+        """Initialize paths and create necessary directories"""
+        if self.DATA_DIR is None:
+            self.DATA_DIR = self.BASE_PATH / "data"
+        
+        self.DB_PATH = self.DATA_DIR / self.DB_NAME
+        self.BACKUP_DIR = self.BASE_PATH / "backups"
+        self.FILES_DIR = self.BASE_PATH / "files"
+        self.LOG_FILE = self.BASE_PATH / "app.log"
+        
+        # Create necessary directories
+        self.DATA_DIR.mkdir(parents=True, exist_ok=True)
+        self.BACKUP_DIR.mkdir(parents=True, exist_ok=True)
+        self.FILES_DIR.mkdir(parents=True, exist_ok=True)
     
     # Application
     APP_NAME: str = "Laboratory Management System"
@@ -54,11 +83,11 @@ class AppConfig:
     PAGE_SIZE: int = 50
     
     # Backup
-    BACKUP_DIR: Path = Path(__file__).parent / "backups"
+    BACKUP_DIR: Path = None
     MAX_BACKUPS: int = 10
     
     # Files
-    FILES_DIR: Path = Path(__file__).parent / "files"
+    FILES_DIR: Path = None
     
     # Theme
     DEFAULT_THEME: Theme = Theme.LIGHT
@@ -72,13 +101,8 @@ class AppConfig:
     DEFAULT_ADMIN_PASSWORD: str = "admin123"
     
     # Logging
-    LOG_FILE: Path = Path(__file__).parent / "app.log"
+    LOG_FILE: Path = None
     LOG_LEVEL: str = "INFO"
-    
-    def __post_init__(self):
-        """Create necessary directories"""
-        self.BACKUP_DIR.mkdir(parents=True, exist_ok=True)
-        self.FILES_DIR.mkdir(parents=True, exist_ok=True)
 
 
 # Global configuration instance
@@ -117,6 +141,55 @@ def get_theme_colors(theme: Theme) -> dict:
         }
 
 
+def _normalize_status_value(status_str: str) -> str:
+    normalized = str(status_str).strip().lower()
+    if normalized.startswith('treatmentstatus.'):
+        normalized = normalized.split('treatmentstatus.')[-1]
+    return normalized.replace(' ', '').replace('-', '_')
+
+
+def _coerce_status_enum(status) -> TreatmentStatus | None:
+    if status is None:
+        return None
+
+    if isinstance(status, TreatmentStatus):
+        return status
+
+    if isinstance(status, str):
+        normalized = _normalize_status_value(status)
+        if normalized in {s.name.lower() for s in TreatmentStatus}:
+            try:
+                return TreatmentStatus[normalized.upper()]
+            except KeyError:
+                pass
+
+        for enum_value in TreatmentStatus:
+            if normalized == _normalize_status_value(enum_value.value):
+                return enum_value
+
+        normalized_no_underscore = normalized.replace('_', '')
+        for enum_value in TreatmentStatus:
+            if normalized_no_underscore == enum_value.name.lower().replace('_', ''):
+                return enum_value
+            if normalized_no_underscore == _normalize_status_value(enum_value.value).replace('_', ''):
+                return enum_value
+
+        return None
+
+    if hasattr(status, 'name'):
+        status_name = getattr(status, 'name', None)
+        if isinstance(status_name, str):
+            try:
+                return TreatmentStatus[status_name]
+            except KeyError:
+                pass
+        status_value = getattr(status, 'value', None)
+        if isinstance(status_value, str):
+            return _coerce_status_enum(status_value)
+
+    return None
+
+
 def get_status_color(status: TreatmentStatus) -> str:
     """Get color for treatment status"""
     colors = {
@@ -127,7 +200,9 @@ def get_status_color(status: TreatmentStatus) -> str:
         TreatmentStatus.REFUSED: "#9E9E9E",
         TreatmentStatus.NO_CHANGE: "#9E9E9E",
     }
-    return colors.get(status, "#9E9E9E")
+
+    status_enum = _coerce_status_enum(status)
+    return colors.get(status_enum, "#9E9E9E")
 
 
 def get_status_display(status: TreatmentStatus) -> str:
@@ -145,17 +220,19 @@ def get_status_display(status: TreatmentStatus) -> str:
         }
     else:  # Russian
         display = {
-            TreatmentStatus.IN_PROGRESS: "🟡 В процессе лечения",
-            TreatmentStatus.CURED: "🟢 Вылечен",
-            TreatmentStatus.TREATMENT_COMPLETED: "🔵 Лечение завершено",
-            TreatmentStatus.NOT_CURED: "🔴 Не удалось вылечить",
-            TreatmentStatus.REFUSED: "⚪ Отказался от лечения",
-            TreatmentStatus.NO_CHANGE: "⚪ Без изменений",
+            TreatmentStatus.IN_PROGRESS: "В процессе лечения",
+            TreatmentStatus.CURED: "Вылечен",
+            TreatmentStatus.TREATMENT_COMPLETED: "Лечение завершено",
+            TreatmentStatus.NOT_CURED: "Не вылечен",
+            TreatmentStatus.REFUSED: "Отказался от лечения",
+            TreatmentStatus.NO_CHANGE: "Без изменений",
         }
-    # Handle both enum and string inputs
-    if isinstance(status, str):
-        return status
-    return display.get(status, str(status))
+
+    status_enum = _coerce_status_enum(status)
+    if status_enum is None:
+        return str(status)
+
+    return display.get(status_enum, str(status))
 
 
 def get_translation(key: str) -> str:
@@ -177,17 +254,31 @@ def get_translation(key: str) -> str:
             "import": "Импорт",
             "backup": "Резервная копия",
             "general_statistics": "Общая статистика",
-            "treatment": "Лечение",
+            "treatment": "Статистика лечения",
+            "treatment_statistics": "Статистика лечения",
             "diseases": "Заболевания",
             "completed_treatment": "Завершено лечение",
             "avg_treatment_days": "Среднее время (дней)",
             "patients_by_doctor": "Пациенты по врачам",
             "disease_distribution": "Распределение по типам заболеваний",
-            "status_distribution": "Распределение по статусам лечения",
+            "status_distribution": "Распределение по результатам",
+            "result": "Результат",
             "total_patients": "Всего пациентов",
             "active_patients": "Активные пациенты",
             "completed_patients": "Завершенные",
+            "new_this_month": "Новых за месяц",
+            "new_this_year": "Новых за год",
+            "activity": "Активность",
+            "activity_last_30_days": "Активность за последние 30 дней",
+            "month": "Месяц",
+            "months": "Месяцы",
+            "days": "Дни",
+            "actions": "Действия",
+            "quantity": "Количество",
+            "doctors": "Врачи",
             "language": "Язык",
+            "new_this_month": "Новых за месяц",
+            "new_this_year": "Новых за год",
         },
         Language.TAJIK: {
             "app_name": "Системаи идоракунии лаборатория",
@@ -203,17 +294,31 @@ def get_translation(key: str) -> str:
             "import": "Воридот",
             "backup": "Нусхаи захиравӣ",
             "general_statistics": "Омири умумӣ",
-            "treatment": "Табобат",
+            "treatment": "Омори табобат",
+            "treatment_statistics": "Омори табобат",
             "diseases": "Бемориҳо",
             "completed_treatment": "Табобат ба анҷом расид",
             "avg_treatment_days": "Вақти миёна (рӯз)",
             "patients_by_doctor": "Беморон аз рӯи духтурон",
             "disease_distribution": "Тақсимот аз рӯи намудҳои беморӣ",
-            "status_distribution": "Тақсимот аз рӯи вазъи табобат",
+            "status_distribution": "Тақсимот аз рӯи натиҷа",
+            "result": "Натиҷа",
             "total_patients": "Ҳамаи беморон",
             "active_patients": "Беморони фаъол",
             "completed_patients": "Ба анҷом расида",
+            "new_this_month": "Нови ин моҳ",
+            "new_this_year": "Нови ин сол",
+            "activity": "Фаъолият",
+            "activity_last_30_days": "Фаъолият дар 30 рӯзи охир",
+            "month": "Моҳ",
+            "months": "Моҳҳо",
+            "days": "Рӯзҳо",
+            "actions": "Амалҳо",
+            "quantity": "Миқдор",
+            "doctors": "Духтурон",
             "language": "Забон",
+            "new_this_month": "Нав дар моҳи ҷорӣ",
+            "new_this_year": "Нав дар соли ҷорӣ",
         }
     }
     

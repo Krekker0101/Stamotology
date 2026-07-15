@@ -3,13 +3,21 @@ Main entry point for Laboratory Management System
 """
 import sys
 import logging
+
 from PySide6.QtWidgets import QApplication
 from PySide6.QtCore import Qt
-from PySide6.QtGui import QFont
+from PySide6.QtGui import QFont, QIcon
+from pathlib import Path
 import config
 from database import db_manager, init_db
 from ui.login_window import LoginWindow
 from ui.main_window import MainWindow
+
+
+def get_resource_path(relative_path: str) -> Path:
+    """Resolve bundled resources in both development and PyInstaller builds."""
+    base_path = Path(getattr(sys, "_MEIPASS", Path(__file__).parent))
+    return base_path / relative_path
 
 
 # Configure logging
@@ -30,6 +38,11 @@ def main():
     app = QApplication(sys.argv)
     app.setApplicationName(config.config.APP_NAME)
     app.setApplicationVersion(config.config.APP_VERSION)
+    
+    # Set application icon
+    icon_path = get_resource_path("img/logo.ico")
+    if icon_path.exists():
+        app.setWindowIcon(QIcon(str(icon_path)))
     
     # High DPI scaling is automatic in Qt 6, no need to set attributes
     # app.setAttribute(Qt.ApplicationAttribute.AA_EnableHighDpiScaling, True)

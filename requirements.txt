@@ -6,3 +6,5 @@ bcrypt==4.2.1
 matplotlib==3.10.0
 pandas==2.2.3
 seaborn==0.13.2
+pywin32==306
+winshell==0.6

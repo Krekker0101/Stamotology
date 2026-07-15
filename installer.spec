@@ -1,43 +1,39 @@
 # -*- mode: python ; coding: utf-8 -*-
 """
-PyInstaller spec file for Laboratory Management System
-Builds the application into a single .exe file for Windows
+PyInstaller spec file for Laboratory Management System Installer
+Builds the installer into a single .exe file for Windows
 """
 
 block_cipher = None
 
 a = Analysis(
-    ['main.py'],
+    ['installer.py'],
     pathex=[],
     binaries=[],
     datas=[
-        # Include the logo image
-        ('img/logo.png', 'img'),
-        ('img/logo.ico', 'img'),
+        # Include the main application exe and images
+        ('dist/LaboratoryManagement.exe', '.'),
+        ('img', 'img'),
     ],
     hiddenimports=[
         'PySide6.QtCore',
         'PySide6.QtGui',
         'PySide6.QtWidgets',
-        'sqlalchemy',
-        'sqlalchemy.dialects.sqlite',
-        'pandas',
-        'openpyxl',
-        'reportlab',
-        'reportlab.pdfgen',
-        'reportlab.lib',
-        'reportlab.platypus',
-        'matplotlib',
-        'matplotlib.backends.backend_qt5agg',
-        'bcrypt',
+        'win32com',
+        'win32api',
+        'win32con',
+        'win32gui',
+        'winshell',
+        'pythoncom',
+        'pywintypes',
     ],
     hookspath=[],
     hooksconfig={},
     runtime_hooks=[],
     excludes=[
         'tkinter',
-        'matplotlib.tests',
-        'pandas.tests',
+        'matplotlib',
+        'pandas',
         'pytest',
     ],
     win_no_prefer_redirects=False,
@@ -55,18 +51,18 @@ exe = EXE(
     a.zipfiles,
     a.datas,
     [],
-    name='LaboratoryManagement',
+    name='LaboratoryManagementSetup',
     debug=False,
     bootloader_ignore_signals=False,
     strip=False,
     upx=True,
     upx_exclude=[],
     runtime_tmpdir=None,
-    console=False,  # Set to True for debugging
+    console=False,
     disable_windowed_traceback=False,
     argv_emulation=False,
     target_arch=None,
     codesign_identity=None,
     entitlements_file=None,
-    icon='img/logo.ico',  # Application icon
+    icon='img/logo.ico',
 )

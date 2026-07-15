@@ -10,6 +10,7 @@ from PySide6.QtGui import QFont, QIcon
 import config
 from services.auth import auth_service
 from models import User
+from i18n import tr
 
 
 class LoginWindow(QWidget):
@@ -25,7 +26,7 @@ class LoginWindow(QWidget):
     
     def init_ui(self):
         """Initialize the UI"""
-        self.setWindowTitle(f"{config.config.APP_NAME} - Вход")
+        self.setWindowTitle(f"{config.config.APP_NAME} - {tr('login')}")
         self.setFixedSize(400, 500)
         
         # Main layout
@@ -43,7 +44,7 @@ class LoginWindow(QWidget):
         layout.addWidget(title_label)
         
         # Subtitle
-        subtitle_label = QLabel("Система управления лабораторией")
+        subtitle_label = QLabel(tr("login_subtitle"))
         subtitle_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
         subtitle_font = QFont()
         subtitle_font.setPointSize(10)
@@ -57,28 +58,28 @@ class LoginWindow(QWidget):
         layout.addWidget(separator)
         
         # Username field
-        username_label = QLabel("Имя пользователя:")
+        username_label = QLabel(tr("username") + ":")
         username_label.setFont(QFont())
         layout.addWidget(username_label)
         
         self.username_edit = QLineEdit()
-        self.username_edit.setPlaceholderText("Введите имя пользователя")
+        self.username_edit.setPlaceholderText(tr("enter_username"))
         self.username_edit.setMinimumHeight(40)
         layout.addWidget(self.username_edit)
         
         # Password field
-        password_label = QLabel("Пароль:")
+        password_label = QLabel(tr("password") + ":")
         password_label.setFont(QFont())
         layout.addWidget(password_label)
         
         self.password_edit = QLineEdit()
-        self.password_edit.setPlaceholderText("Введите пароль")
+        self.password_edit.setPlaceholderText(tr("enter_password"))
         self.password_edit.setEchoMode(QLineEdit.EchoMode.Password)
         self.password_edit.setMinimumHeight(40)
         layout.addWidget(self.password_edit)
         
         # Login button
-        self.login_button = QPushButton("Войти")
+        self.login_button = QPushButton(tr("login"))
         self.login_button.setMinimumHeight(45)
         self.login_button.setFont(QFont())
         self.login_button.clicked.connect(self.handle_login)
@@ -86,8 +87,7 @@ class LoginWindow(QWidget):
         
         # Info label
         info_label = QLabel(
-            f"По умолчанию: admin / {config.config.DEFAULT_ADMIN_PASSWORD}\n"
-            "Пожалуйста, измените пароль после первого входа"
+            tr("default_credentials").format(password=config.config.DEFAULT_ADMIN_PASSWORD)
         )
         info_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
         info_label.setStyleSheet("color: #666;")
@@ -97,7 +97,7 @@ class LoginWindow(QWidget):
         layout.addWidget(info_label)
         
         # Version label
-        version_label = QLabel(f"Версия {config.config.APP_VERSION}")
+        version_label = QLabel(tr("version").format(version=config.config.APP_VERSION))
         version_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
         version_label.setStyleSheet("color: #999;")
         version_font = QFont()
@@ -160,7 +160,7 @@ class LoginWindow(QWidget):
         password = self.password_edit.text()
         
         if not username or not password:
-            QMessageBox.warning(self, "Ошибка", "Введите имя пользователя и пароль")
+            QMessageBox.warning(self, tr("error"), tr("enter_username_password"))
             return
         
         # Authenticate user
@@ -171,7 +171,7 @@ class LoginWindow(QWidget):
             self.login_successful.emit(user)
             self.close()
         else:
-            QMessageBox.critical(self, "Ошибка входа", message)
+            QMessageBox.critical(self, tr("login_error"), message)
             self.password_edit.clear()
             self.password_edit.setFocus()
     

@@ -3,20 +3,26 @@ Main window UI for Laboratory Management System
 """
 from PySide6.QtWidgets import (
     QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, QPushButton, 
-    QLabel, QStackedWidget, QFrame, QMessageBox
+    QLabel, QStackedWidget, QFrame, QMessageBox, QGraphicsDropShadowEffect
 )
-from PySide6.QtCore import Qt, Signal
-from PySide6.QtGui import QFont, QPixmap
+from PySide6.QtCore import Qt, Signal, QSize
+from PySide6.QtGui import QFont, QPixmap, QIcon, QColor
 from pathlib import Path
+import sys
 import config
+from i18n import tr
 from models import User, UserRole
 from ui.patients_view import PatientsView
 from ui.patient_dialog import PatientDialog
 from ui.search_view import SearchView
-from ui.statistics_view import StatisticsView
 from ui.settings_dialog import SettingsDialog
-from ui.backup_dialog import BackupDialog
+from ui.user_dialog import UserManagementDialog
 from services.patient import patient_service
+
+
+def get_resource_path(relative_path: str) -> Path:
+    base_path = Path(getattr(sys, "_MEIPASS", Path(__file__).resolve().parent.parent))
+    return base_path / relative_path
 
 
 class MainWindow(QMainWindow):
@@ -58,15 +64,83 @@ class MainWindow(QMainWindow):
         # Create views
         self.patients_view = PatientsView(self.current_user)
         self.search_view = SearchView(self.current_user)
-        self.statistics_view = StatisticsView()
+        self.statistics_view = None
+        self.statistics_placeholder = QWidget()
         
         # Add views to stacked widget
         self.content_area.addWidget(self.patients_view)
         self.content_area.addWidget(self.search_view)
-        self.content_area.addWidget(self.statistics_view)
+        self.content_area.addWidget(self.statistics_placeholder)
         
         # Show patients view by default
         self.content_area.setCurrentWidget(self.patients_view)
+
+    def ensure_statistics_view(self):
+        """Create the statistics view only when it is first opened."""
+        if self.statistics_view is None:
+            from ui.statistics_view import StatisticsView
+
+            self.statistics_view = StatisticsView()
+            self.statistics_view.apply_theme(self.current_theme)
+            self.content_area.removeWidget(self.statistics_placeholder)
+            self.statistics_placeholder.deleteLater()
+            self.statistics_placeholder = None
+            self.content_area.insertWidget(2, self.statistics_view)
+        return self.statistics_view
+
+    def create_brand_header(self) -> QFrame:
+        """Create the compact app brand area used in the sidebar."""
+        header = QFrame()
+        header.setObjectName("brandHeader")
+        header.setFixedHeight(68)
+
+        header_layout = QHBoxLayout(header)
+        header_layout.setSpacing(12)
+        header_layout.setContentsMargins(2, 6, 2, 8)
+
+        icon_frame = QFrame()
+        icon_frame.setObjectName("brandIconFrame")
+        icon_frame.setFixedSize(52, 52)
+
+        shadow = QGraphicsDropShadowEffect(icon_frame)
+        shadow.setBlurRadius(18)
+        shadow.setOffset(0, 4)
+        shadow.setColor(QColor(33, 150, 243, 70))
+        icon_frame.setGraphicsEffect(shadow)
+
+        icon_layout = QVBoxLayout(icon_frame)
+        icon_layout.setContentsMargins(8, 8, 8, 8)
+
+        logo_label = QLabel()
+        logo_label.setObjectName("brandIcon")
+        logo_label.setFixedSize(36, 36)
+        logo_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+
+        icon_path = get_resource_path("img/logo.ico")
+        pixmap = QIcon(str(icon_path)).pixmap(QSize(34, 34)) if icon_path.exists() else QPixmap()
+        if pixmap.isNull():
+            png_path = get_resource_path("img/logo.png")
+            if png_path.exists():
+                pixmap = QPixmap(str(png_path)).scaled(
+                    34, 34,
+                    Qt.AspectRatioMode.KeepAspectRatio,
+                    Qt.TransformationMode.SmoothTransformation
+                )
+        logo_label.setPixmap(pixmap)
+        icon_layout.addWidget(logo_label, alignment=Qt.AlignmentFlag.AlignCenter)
+
+        branding_label = QLabel("Стамотология")
+        branding_label.setObjectName("brandTitle")
+        branding_label.setAlignment(Qt.AlignmentFlag.AlignVCenter | Qt.AlignmentFlag.AlignLeft)
+        branding_label.setWordWrap(False)
+        branding_label.setMinimumWidth(0)
+        branding_font = QFont("Segoe UI", 15)
+        branding_font.setBold(True)
+        branding_label.setFont(branding_font)
+
+        header_layout.addWidget(icon_frame)
+        header_layout.addWidget(branding_label, 1)
+        return header
     
     def create_sidebar(self) -> QFrame:
         """Create sidebar with navigation buttons"""
@@ -77,30 +151,7 @@ class MainWindow(QMainWindow):
         layout.setSpacing(10)
         layout.setContentsMargins(10, 10, 10, 10)
         
-        # Logo and branding header
-        header_layout = QHBoxLayout()
-        header_layout.setSpacing(10)
-        header_layout.setContentsMargins(0, 0, 0, 0)
-        
-        # Logo
-        logo_path = Path(__file__).parent.parent / "img" / "logo.jpg"
-        if logo_path.exists():
-            logo_label = QLabel()
-            pixmap = QPixmap(str(logo_path))
-            scaled_pixmap = pixmap.scaledToHeight(50, Qt.TransformationMode.SmoothTransformation)
-            logo_label.setPixmap(scaled_pixmap)
-            header_layout.addWidget(logo_label)
-        
-        # App name branding
-        branding_label = QLabel("Stamotology")
-        branding_font = QFont("Segoe UI", 15)
-        branding_font.setBold(True)
-        branding_font.setLetterSpacing(QFont.PercentageSpacing, 105)
-        branding_label.setFont(branding_font)
-        branding_label.setAlignment(Qt.AlignmentFlag.AlignVCenter)
-        header_layout.addWidget(branding_label, 1)
-        
-        layout.addLayout(header_layout)
+        layout.addWidget(self.create_brand_header())
         
         # Separator
         separator = QFrame()
@@ -118,9 +169,9 @@ class MainWindow(QMainWindow):
         
         # Role badge
         role_text = {
-            UserRole.ADMIN: "🔐 Администратор",
-            UserRole.DOCTOR: "👨‍⚕️ Врач",
-            UserRole.RECEPTIONIST: "📞 Регистратор"
+            UserRole.ADMIN: tr("admin_role"),
+            UserRole.DOCTOR: tr("doctor_role"),
+            UserRole.RECEPTIONIST: tr("receptionist_role")
         }
         role_label = QLabel(role_text.get(self.current_user.role, ""))
         role_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
@@ -136,40 +187,43 @@ class MainWindow(QMainWindow):
         layout.addWidget(separator)
         
         # Navigation buttons
-        self.btn_patients = self.create_sidebar_button("📋 Пациенты")
+        self.btn_patients = self.create_sidebar_button(f"📋 {tr('patients')}")
         self.btn_patients.clicked.connect(lambda: self.show_view(0))
         layout.addWidget(self.btn_patients)
         
-        self.btn_search = self.create_sidebar_button("🔍 Поиск")
+        self.btn_search = self.create_sidebar_button(f"🔍 {tr('search')}")
         self.btn_search.clicked.connect(lambda: self.show_view(1))
         layout.addWidget(self.btn_search)
         
-        self.btn_statistics = self.create_sidebar_button("📊 Статистика")
+        self.btn_statistics = self.create_sidebar_button(f"📊 {tr('statistics')}")
         self.btn_statistics.clicked.connect(lambda: self.show_view(2))
         layout.addWidget(self.btn_statistics)
         
+        # User management button (admin only)
+        if self.current_user.role == UserRole.ADMIN:
+            self.btn_users = self.create_sidebar_button(f"👥 {tr('users')}")
+            self.btn_users.clicked.connect(self.show_user_management)
+            layout.addWidget(self.btn_users)
+        
         # Add patient button
-        self.btn_add_patient = self.create_sidebar_button("➕ Добавить пациента")
+        self.btn_add_patient = self.create_sidebar_button(f"➕ {tr('add_patient')}")
         self.btn_add_patient.clicked.connect(self.add_patient)
         layout.addWidget(self.btn_add_patient)
         
         layout.addStretch()
         
         # Language switcher
-        self.btn_language = self.create_sidebar_button("🌐 Русский")
+        lang_text = "🌐 Русский" if config.config.current_language == config.Language.RUSSIAN else "🌐 Тоҷикӣ"
+        self.btn_language = self.create_sidebar_button(lang_text)
         self.btn_language.clicked.connect(self.switch_language)
         layout.addWidget(self.btn_language)
         
         # Bottom buttons
-        self.btn_backup = self.create_sidebar_button("💾 Резервные копии")
-        self.btn_backup.clicked.connect(self.show_backup_dialog)
-        layout.addWidget(self.btn_backup)
-        
-        self.btn_settings = self.create_sidebar_button("⚙️ Настройки")
+        self.btn_settings = self.create_sidebar_button(f"⚙️ {tr('settings')}")
         self.btn_settings.clicked.connect(self.show_settings_dialog)
         layout.addWidget(self.btn_settings)
         
-        self.btn_logout = self.create_sidebar_button("🚪 Выход")
+        self.btn_logout = self.create_sidebar_button(f"🚪 {tr('logout')}")
         self.btn_logout.clicked.connect(self.logout)
         layout.addWidget(self.btn_logout)
         
@@ -185,6 +239,9 @@ class MainWindow(QMainWindow):
     
     def show_view(self, index: int):
         """Show a specific view"""
+        if index == 2:
+            self.ensure_statistics_view()
+
         self.content_area.setCurrentIndex(index)
         
         # Update button states
@@ -211,16 +268,16 @@ class MainWindow(QMainWindow):
         if dialog.exec():
             self.patients_view.refresh_data()
     
-    def show_backup_dialog(self):
-        """Show backup dialog"""
-        dialog = BackupDialog(parent=self)
-        dialog.exec()
-    
     def show_settings_dialog(self):
         """Show settings dialog"""
         dialog = SettingsDialog(self.current_user, parent=self)
         if dialog.exec():
             self.apply_theme()
+    
+    def show_user_management(self):
+        """Show user management dialog (admin only)"""
+        dialog = UserManagementDialog(parent=self)
+        dialog.exec()
     
     def switch_language(self):
         """Switch between Russian and Tajik"""
@@ -235,25 +292,42 @@ class MainWindow(QMainWindow):
         self.update_ui_language()
         # Refresh views to update translations
         self.patients_view.refresh_data()
-        self.statistics_view.refresh_data()
+        self.patients_view.update_language()
+        self.search_view.refresh_data()
+        self.search_view.update_language()
+        if self.statistics_view is not None:
+            self.statistics_view.refresh_data()
+            self.statistics_view.update_language()
     
     def update_ui_language(self):
         """Update UI elements with current language"""
         # Update sidebar buttons
-        self.btn_patients.setText(f"📋 {config.get_translation('patients')}")
-        self.btn_search.setText(f"🔍 {config.get_translation('search')}")
-        self.btn_statistics.setText(f"📊 {config.get_translation('statistics')}")
-        self.btn_add_patient.setText(f"➕ {config.get_translation('add_patient')}")
-        self.btn_backup.setText(f"💾 {config.get_translation('backup')}")
-        self.btn_settings.setText(f"⚙️ {config.get_translation('settings')}")
-        self.btn_logout.setText(f"🚪 {config.get_translation('logout')}")
+        self.btn_patients.setText(f"📋 {tr('patients')}")
+        self.btn_search.setText(f"🔍 {tr('search')}")
+        self.btn_statistics.setText(f"📊 {tr('statistics')}")
+        self.btn_add_patient.setText(f"➕ {tr('add_patient')}")
+        self.btn_settings.setText(f"⚙️ {tr('settings')}")
+        self.btn_logout.setText(f"🚪 {tr('logout')}")
+        
+        # Update role badge
+        role_text = {
+            UserRole.ADMIN: tr("admin_role"),
+            UserRole.DOCTOR: tr("doctor_role"),
+            UserRole.RECEPTIONIST: tr("receptionist_role")
+        }
+        # Find and update role label
+        for i in range(self.sidebar.layout().count()):
+            widget = self.sidebar.layout().itemAt(i).widget()
+            if isinstance(widget, QLabel) and widget.text() in [role_text.get(UserRole.ADMIN), role_text.get(UserRole.DOCTOR), role_text.get(UserRole.RECEPTIONIST)]:
+                widget.setText(role_text.get(self.current_user.role, ""))
+                break
     
     def logout(self):
         """Handle logout"""
         reply = QMessageBox.question(
             self, 
-            config.get_translation('logout'), 
-            "Вы уверены, что хотите выйти?" if config.config.current_language == config.Language.RUSSIAN else "Шумо мутмаъин ҳастед, ки мехоҳед бароед?",
+            tr('logout'), 
+            tr('logout_confirm'),
             QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No
         )
         
@@ -308,7 +382,8 @@ class MainWindow(QMainWindow):
         # Apply theme to views
         self.patients_view.apply_theme(self.current_theme)
         self.search_view.apply_theme(self.current_theme)
-        self.statistics_view.apply_theme(self.current_theme)
+        if self.statistics_view is not None:
+            self.statistics_view.apply_theme(self.current_theme)
     
     def set_theme(self, theme: config.Theme):
         """Set the application theme"""

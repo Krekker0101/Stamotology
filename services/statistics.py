@@ -7,7 +7,7 @@ from typing import Dict, List
 from datetime import datetime, timedelta
 from sqlalchemy import func, and_
 from database import db_manager
-from models import Patient, TreatmentStatus, ActionLog
+from models import Patient, TreatmentStatus, ActionLog, User, UserRole
 from config import config
 
 
@@ -212,6 +212,42 @@ class StatisticsService:
             logger.error(f"Error getting treatment statistics: {e}")
             return {}
     
+    @staticmethod
+    def get_doctor_patient_report() -> List[Dict]:
+        """Get a report of doctors and the patients assigned to them"""
+        try:
+            with db_manager.session_scope(expire_on_commit=False) as session:
+                # Get all unique treating_doctor values from patients
+                doctor_names = session.query(Patient.treating_doctor).filter(
+                    Patient.treating_doctor.isnot(None),
+                    Patient.treating_doctor != ''
+                ).distinct().all()
+                
+                doctor_names = sorted([name[0] for name in doctor_names if name[0]])
+
+                report = []
+                for doctor_name in doctor_names:
+                    patients = session.query(Patient).filter(
+                        Patient.treating_doctor == doctor_name
+                    ).order_by(Patient.registration_date.asc()).all()
+
+                    report.append({
+                        'doctor': doctor_name,
+                        'patient_count': len(patients),
+                        'patients': [
+                            {
+                                'full_name': patient.full_name,
+                                'registration_date': patient.registration_date,
+                            }
+                            for patient in patients
+                        ],
+                    })
+
+                return report
+        except Exception as e:
+            logger.error(f"Error getting doctor patient report: {e}")
+            return []
+
     @staticmethod
     def get_activity_statistics(days: int = 30) -> Dict:
         """

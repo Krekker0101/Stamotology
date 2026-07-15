@@ -10,9 +10,12 @@ from PySide6.QtCore import Qt, QDate
 from PySide6.QtGui import QFont
 from datetime import datetime
 import config
-from models import Patient, TreatmentStatus, Gender
+from config import get_status_display
+from models import Patient, TreatmentStatus, Gender, UserRole
+from services.auth import auth_service
 from services.patient import patient_service
-from utils.helpers import get_unique_disease_types, get_unique_doctors
+from utils.helpers import get_unique_disease_types
+from i18n import tr
 
 
 class PatientDialog(QDialog):
@@ -31,7 +34,7 @@ class PatientDialog(QDialog):
     
     def init_ui(self):
         """Initialize the UI"""
-        title = "Редактировать пациента" if self.is_edit else "Добавить пациента"
+        title = tr("edit_patient_title") if self.is_edit else tr("add_patient_title")
         self.setWindowTitle(title)
         self.setFixedSize(700, 750)
         
@@ -44,27 +47,27 @@ class PatientDialog(QDialog):
         
         # Main info tab
         self.main_tab = self.create_main_tab()
-        self.tab_widget.addTab(self.main_tab, "Основная информация")
+        self.tab_widget.addTab(self.main_tab, tr("main_info"))
         
         # Attachments tab
         self.attachments_tab = self.create_attachments_tab()
-        self.tab_widget.addTab(self.attachments_tab, "Файлы")
+        self.tab_widget.addTab(self.attachments_tab, tr("files"))
         
         # Reminders tab
         self.reminders_tab = self.create_reminders_tab()
-        self.tab_widget.addTab(self.reminders_tab, "Напоминания")
+        self.tab_widget.addTab(self.reminders_tab, tr("reminders"))
         
         layout.addWidget(self.tab_widget)
         
         # Buttons
         button_layout = QHBoxLayout()
         
-        self.save_button = QPushButton("Сохранить")
+        self.save_button = QPushButton(tr("save_patient"))
         self.save_button.setMinimumHeight(40)
         self.save_button.clicked.connect(self.save_patient)
         button_layout.addWidget(self.save_button)
         
-        self.cancel_button = QPushButton("Отмена")
+        self.cancel_button = QPushButton(tr("cancel"))
         self.cancel_button.setMinimumHeight(40)
         self.cancel_button.clicked.connect(self.reject)
         button_layout.addWidget(self.cancel_button)
@@ -91,20 +94,20 @@ class PatientDialog(QDialog):
         
         # Full name
         name_layout = QHBoxLayout()
-        name_label = QLabel("ФИО *:")
+        name_label = QLabel(tr("full_name_required"))
         name_label.setFixedWidth(100)
         self.name_edit = QLineEdit()
-        self.name_edit.setPlaceholderText("Введите ФИО пациента")
+        self.name_edit.setPlaceholderText(tr("enter_full_name"))
         name_layout.addWidget(name_label)
         name_layout.addWidget(self.name_edit)
         layout.addLayout(name_layout)
         
         # Phone
         phone_layout = QHBoxLayout()
-        phone_label = QLabel("Телефон *:")
+        phone_label = QLabel(tr("phone_required"))
         phone_label.setFixedWidth(100)
         self.phone_edit = QLineEdit()
-        self.phone_edit.setPlaceholderText("Введите номер телефона")
+        self.phone_edit.setPlaceholderText(tr("enter_phone"))
         phone_layout.addWidget(phone_label)
         phone_layout.addWidget(self.phone_edit)
         layout.addLayout(phone_layout)
@@ -112,17 +115,17 @@ class PatientDialog(QDialog):
         # Birth year and gender
         birth_gender_layout = QHBoxLayout()
         
-        birth_label = QLabel("Год рождения *:")
+        birth_label = QLabel(tr("birth_year_required"))
         birth_label.setFixedWidth(100)
         self.birth_year_edit = QLineEdit()
-        self.birth_year_edit.setPlaceholderText("Год")
+        self.birth_year_edit.setPlaceholderText(tr("year"))
         self.birth_year_edit.setMaximumWidth(100)
         birth_gender_layout.addWidget(birth_label)
         birth_gender_layout.addWidget(self.birth_year_edit)
         
-        gender_label = QLabel("Пол *:")
+        gender_label = QLabel(tr("gender_required"))
         self.gender_combo = QComboBox()
-        self.gender_combo.addItems(["Мужской", "Женский"])
+        self.gender_combo.addItems([tr("male"), tr("female")])
         birth_gender_layout.addWidget(gender_label)
         birth_gender_layout.addWidget(self.gender_combo)
         
@@ -130,10 +133,10 @@ class PatientDialog(QDialog):
         
         # Address
         address_layout = QHBoxLayout()
-        address_label = QLabel("Адрес:")
+        address_label = QLabel(tr("address"))
         address_label.setFixedWidth(100)
         self.address_edit = QLineEdit()
-        self.address_edit.setPlaceholderText("Введите адрес")
+        self.address_edit.setPlaceholderText(tr("enter_address"))
         address_layout.addWidget(address_label)
         address_layout.addWidget(self.address_edit)
         layout.addLayout(address_layout)
@@ -141,7 +144,7 @@ class PatientDialog(QDialog):
         # Disease type and name
         disease_layout = QHBoxLayout()
         
-        disease_type_label = QLabel("Тип заболевания *:")
+        disease_type_label = QLabel(tr("disease_type_required"))
         disease_type_label.setFixedWidth(100)
         self.disease_type_combo = QComboBox()
         self.disease_type_combo.setEditable(True)
@@ -152,20 +155,20 @@ class PatientDialog(QDialog):
         layout.addLayout(disease_layout)
         
         disease_name_layout = QHBoxLayout()
-        disease_name_label = QLabel("Заболевание *:")
+        disease_name_label = QLabel(tr("disease_name_required"))
         disease_name_label.setFixedWidth(100)
         self.disease_name_edit = QLineEdit()
-        self.disease_name_edit.setPlaceholderText("Название заболевания")
+        self.disease_name_edit.setPlaceholderText(tr("enter_disease_name"))
         disease_name_layout.addWidget(disease_name_label)
         disease_name_layout.addWidget(self.disease_name_edit)
         layout.addLayout(disease_name_layout)
         
         # Treating doctor
         doctor_layout = QHBoxLayout()
-        doctor_label = QLabel("Лечащий врач:")
+        doctor_label = QLabel(tr("treating_doctor"))
         doctor_label.setFixedWidth(100)
         self.doctor_combo = QComboBox()
-        self.doctor_combo.setEditable(True)
+        self.doctor_combo.setEditable(False)
         self.load_doctors()
         doctor_layout.addWidget(doctor_label)
         doctor_layout.addWidget(self.doctor_combo)
@@ -173,18 +176,18 @@ class PatientDialog(QDialog):
         
         # Treatment status
         status_layout = QHBoxLayout()
-        status_label = QLabel("Статус лечения *:")
+        status_label = QLabel(tr("result_required"))
         status_label.setFixedWidth(100)
         self.status_combo = QComboBox()
         for status in TreatmentStatus:
-            self.status_combo.addItem(config.get_status_display(status), status)
+            self.status_combo.addItem(get_status_display(status), status)
         status_layout.addWidget(status_label)
         status_layout.addWidget(self.status_combo)
         layout.addLayout(status_layout)
         
-        # Next appointment
+        # Registration date
         appointment_layout = QHBoxLayout()
-        appointment_label = QLabel("Следующий прием:")
+        appointment_label = QLabel(tr("registration_date_label"))
         appointment_label.setFixedWidth(100)
         self.appointment_edit = QDateEdit()
         self.appointment_edit.setCalendarPopup(True)
@@ -194,11 +197,11 @@ class PatientDialog(QDialog):
         layout.addLayout(appointment_layout)
         
         # Notes
-        notes_label = QLabel("Примечание:")
+        notes_label = QLabel(tr("notes"))
         layout.addWidget(notes_label)
         
         self.notes_edit = QTextEdit()
-        self.notes_edit.setPlaceholderText("Дополнительная информация")
+        self.notes_edit.setPlaceholderText(tr("additional_info"))
         self.notes_edit.setMaximumHeight(100)
         layout.addWidget(self.notes_edit)
         
@@ -218,11 +221,11 @@ class PatientDialog(QDialog):
         # Buttons
         button_layout = QHBoxLayout()
         
-        add_file_button = QPushButton("Добавить файл")
+        add_file_button = QPushButton(tr("add_file"))
         add_file_button.clicked.connect(self.add_file)
         button_layout.addWidget(add_file_button)
         
-        remove_file_button = QPushButton("Удалить файл")
+        remove_file_button = QPushButton(tr("remove_file"))
         remove_file_button.clicked.connect(self.remove_file)
         button_layout.addWidget(remove_file_button)
         
@@ -250,10 +253,10 @@ class PatientDialog(QDialog):
         reminder_layout.addWidget(self.reminder_date_edit)
         
         self.reminder_text_edit = QLineEdit()
-        self.reminder_text_edit.setPlaceholderText("Текст напоминания")
+        self.reminder_text_edit.setPlaceholderText(tr("reminder_text"))
         reminder_layout.addWidget(self.reminder_text_edit)
         
-        add_reminder_button = QPushButton("Добавить")
+        add_reminder_button = QPushButton(tr("add_reminder"))
         add_reminder_button.clicked.connect(self.add_reminder)
         reminder_layout.addWidget(add_reminder_button)
         
@@ -269,10 +272,27 @@ class PatientDialog(QDialog):
         self.disease_type_combo.addItems(types)
     
     def load_doctors(self):
-        """Load unique doctors"""
-        doctors = get_unique_doctors()
+        """Load doctors and admins from registered users, excluding the current registrator"""
+        doctors = []
+        for user in auth_service.get_all_users():
+            if not user.full_name or not user.is_active:
+                continue
+            if user.id == getattr(self.user, 'id', None):
+                continue
+            if user.role in {UserRole.DOCTOR, UserRole.ADMIN}:
+                doctors.append(user.full_name)
+
+        doctors = sorted(set(doctors))
+
+        if self.patient and self.patient.treating_doctor and self.patient.treating_doctor not in doctors:
+            doctors.append(self.patient.treating_doctor)
+            doctors = sorted(set(doctors))
+
         self.doctor_combo.clear()
         self.doctor_combo.addItems(doctors)
+
+        if self.patient and self.patient.treating_doctor:
+            self.doctor_combo.setCurrentText(self.patient.treating_doctor)
     
     def load_patient_data(self):
         """Load patient data for editing"""
@@ -299,10 +319,10 @@ class PatientDialog(QDialog):
                 self.status_combo.setCurrentIndex(i)
                 break
         
-        if self.patient.next_appointment:
+        if self.patient.registration_date:
             self.appointment_edit.setDate(
                 QDate.fromString(
-                    self.patient.next_appointment.strftime("%Y-%m-%d"),
+                    self.patient.registration_date.strftime("%Y-%m-%d"),
                     Qt.DateFormat.ISODate
                 )
             )
@@ -344,7 +364,7 @@ class PatientDialog(QDialog):
     def add_file(self):
         """Add file attachment"""
         file_path, _ = QFileDialog.getOpenFileName(
-            self, "Выберите файл", "", "Все файлы (*.*)"
+            self, tr("select_file"), "", tr("all_files")
         )
         
         if file_path:
@@ -371,9 +391,9 @@ class PatientDialog(QDialog):
                 
                 if success:
                     self.load_attachments()
-                    QMessageBox.information(self, "Успех", message)
+                    QMessageBox.information(self, tr("success"), message)
                 else:
-                    QMessageBox.critical(self, "Ошибка", message)
+                    QMessageBox.critical(self, tr("error"), message)
     
     def remove_file(self):
         """Remove selected file"""
@@ -384,8 +404,8 @@ class PatientDialog(QDialog):
         attachment = current_item.data(Qt.ItemDataRole.UserRole)
         
         reply = QMessageBox.question(
-            self, "Подтверждение",
-            f"Удалить файл '{attachment.file_name}'?",
+            self, tr("confirm_delete"),
+            tr("confirm_delete_file").format(name=attachment.file_name),
             QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No
         )
         
@@ -393,21 +413,21 @@ class PatientDialog(QDialog):
             success, message = patient_service.delete_attachment(attachment.id, self.user.id)
             if success:
                 self.load_attachments()
-                QMessageBox.information(self, "Успех", message)
+                QMessageBox.information(self, tr("success"), message)
             else:
-                QMessageBox.critical(self, "Ошибка", message)
+                QMessageBox.critical(self, tr("error"), message)
     
     def add_reminder(self):
         """Add reminder"""
         if not self.patient:
-            QMessageBox.warning(self, "Предупреждение", "Сначала сохраните пациента")
+            QMessageBox.warning(self, tr("warning"), tr("save_patient_first"))
             return
         
         reminder_date = self.reminder_date_edit.date().toPython()
         reminder_text = self.reminder_text_edit.text().strip()
         
         if not reminder_text:
-            QMessageBox.warning(self, "Предупреждение", "Введите текст напоминания")
+            QMessageBox.warning(self, tr("warning"), tr("enter_reminder_text"))
             return
         
         success, message = patient_service.add_reminder(
@@ -420,9 +440,9 @@ class PatientDialog(QDialog):
         if success:
             self.reminder_text_edit.clear()
             self.load_reminders()
-            QMessageBox.information(self, "Успех", message)
+            QMessageBox.information(self, tr("success"), message)
         else:
-            QMessageBox.critical(self, "Ошибка", message)
+            QMessageBox.critical(self, tr("error"), message)
     
     def save_patient(self):
         """Save patient data"""
@@ -434,13 +454,13 @@ class PatientDialog(QDialog):
         disease_name = self.disease_name_edit.text().strip()
         
         if not all([name, phone, birth_year, disease_type, disease_name]):
-            QMessageBox.warning(self, "Ошибка", "Заполните все обязательные поля")
+            QMessageBox.warning(self, tr("error"), tr("fill_required_fields"))
             return
         
         try:
             birth_year = int(birth_year)
         except ValueError:
-            QMessageBox.warning(self, "Ошибка", "Некорректный год рождения")
+            QMessageBox.warning(self, tr("error"), tr("invalid_birth_year"))
             return
         
         # Prepare data
@@ -454,7 +474,7 @@ class PatientDialog(QDialog):
             'disease_name': disease_name,
             'treating_doctor': self.doctor_combo.currentText().strip() or None,
             'treatment_status': self.status_combo.currentData(),
-            'next_appointment': self.appointment_edit.date().toPython() if self.appointment_edit.date().isValid() else None,
+            'registration_date': self.appointment_edit.date().toPython() if self.appointment_edit.date().isValid() else None,
             'notes': self.notes_edit.toPlainText().strip() or None,
         }
         
@@ -466,10 +486,10 @@ class PatientDialog(QDialog):
                 self.patient = patient
         
         if success:
-            QMessageBox.information(self, "Успех", message)
+            QMessageBox.information(self, tr("success"), message)
             self.accept()
         else:
-            QMessageBox.critical(self, "Ошибка", message)
+            QMessageBox.critical(self, tr("error"), message)
     
     def apply_theme(self):
         """Apply theme to the dialog"""
@@ -518,3 +538,32 @@ class PatientDialog(QDialog):
                 color: white;
             }}
         """)
+    
+    def update_language(self):
+        """Update UI language"""
+        # Update window title
+        self.setWindowTitle(tr("edit_patient_title") if self.is_edit else tr("add_patient_title"))
+        
+        # Update tab names
+        self.tab_widget.setTabText(0, tr("main_info"))
+        self.tab_widget.setTabText(1, tr("files"))
+        self.tab_widget.setTabText(2, tr("reminders"))
+        
+        # Update buttons
+        self.save_button.setText(tr("save_patient"))
+        self.cancel_button.setText(tr("cancel"))
+        
+        # Reload gender combo with translated options
+        current_gender = self.gender_combo.currentIndex()
+        self.gender_combo.clear()
+        self.gender_combo.addItems([tr("male"), tr("female")])
+        self.gender_combo.setCurrentIndex(current_gender)
+        
+        # Update placeholders
+        self.name_edit.setPlaceholderText(tr("enter_full_name"))
+        self.phone_edit.setPlaceholderText(tr("enter_phone"))
+        self.birth_year_edit.setPlaceholderText(tr("year"))
+        self.address_edit.setPlaceholderText(tr("enter_address"))
+        self.disease_name_edit.setPlaceholderText(tr("enter_disease_name"))
+        self.notes_edit.setPlaceholderText(tr("additional_info"))
+        self.reminder_text_edit.setPlaceholderText(tr("reminder_text"))

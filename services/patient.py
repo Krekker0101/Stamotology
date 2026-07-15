@@ -42,7 +42,7 @@ class PatientService:
                     disease_name=data.get('disease_name'),
                     treating_doctor=data.get('treating_doctor'),
                     treatment_status=data.get('treatment_status', TreatmentStatus.IN_PROGRESS),
-                    next_appointment=data.get('next_appointment'),
+                    registration_date=data.get('registration_date'),
                     notes=data.get('notes'),
                     created_by=user_id
                 )
