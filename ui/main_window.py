@@ -3,9 +3,10 @@ Main window UI for Laboratory Management System
 """
 from PySide6.QtWidgets import (
     QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, QPushButton, 
-    QLabel, QStackedWidget, QFrame, QMessageBox, QGraphicsDropShadowEffect
+    QLabel, QStackedWidget, QFrame, QMessageBox, QGraphicsDropShadowEffect,
+    QGraphicsOpacityEffect
 )
-from PySide6.QtCore import Qt, Signal, QSize
+from PySide6.QtCore import Qt, Signal, QSize, QPropertyAnimation, QEasingCurve
 from PySide6.QtGui import QFont, QPixmap, QIcon, QColor, QKeySequence, QShortcut
 from pathlib import Path
 import sys
@@ -32,6 +33,7 @@ class MainWindow(QMainWindow):
         super().__init__()
         self.current_user = user
         self.current_theme = config.config.DEFAULT_THEME
+        self._brand_animations = []
         self.init_ui()
         self.configure_shortcuts()
         self.apply_theme()
@@ -132,6 +134,7 @@ class MainWindow(QMainWindow):
                 )
             logo_label.setPixmap(pixmap)
         icon_layout.addWidget(logo_label, alignment=Qt.AlignmentFlag.AlignCenter)
+        self.configure_brand_animation(logo_label)
 
         branding_label = QLabel(config.config.APP_NAME)
         branding_label.setObjectName("brandTitle")
@@ -145,6 +148,21 @@ class MainWindow(QMainWindow):
         header_layout.addWidget(icon_frame)
         header_layout.addWidget(branding_label, 1)
         return header
+
+    def configure_brand_animation(self, logo_label: QLabel):
+        """Add a subtle, paint-only breathing animation to the brand icon."""
+        opacity_effect = QGraphicsOpacityEffect(logo_label)
+        opacity_effect.setOpacity(0.96)
+        logo_label.setGraphicsEffect(opacity_effect)
+
+        opacity_animation = QPropertyAnimation(opacity_effect, b"opacity", self)
+        opacity_animation.setStartValue(0.92)
+        opacity_animation.setEndValue(1.0)
+        opacity_animation.setDuration(2200)
+        opacity_animation.setEasingCurve(QEasingCurve.Type.InOutSine)
+        opacity_animation.setLoopCount(-1)
+        opacity_animation.start()
+        self._brand_animations.append(opacity_animation)
     
     def create_sidebar(self) -> QFrame:
         """Create sidebar with navigation buttons"""
