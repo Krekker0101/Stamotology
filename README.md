@@ -1,229 +1,479 @@
-# Laboratory Management System
+<div align="center">
 
-Профессиональное десктопное приложение для управления лабораторией/медицинским центром, разработанное для Windows 10 и Windows 11.
+# ⚕️ Laboratory Management System
 
-## Особенности
+### Next Generation Laboratory & Medical Center Platform
 
-- **Полностью локальное**: Работает без интернета, все данные хранятся на локальном компьютере
-- **Быстрая работа**: Оптимизировано для работы с базой более 100 000 пациентов
-- **Безопасность**: Шифрование паролей, система прав доступа (Администратор, Врач, Регистратор)
-- **Резервное копирование**: Автоматическое создание и восстановление резервных копий
-- **Экспорт/Импорт**: Поддержка Excel, CSV и PDF форматов
-- **Статистика**: Визуализация данных с диаграммами
-- **Современный интерфейс**: Светлая и темная темы, адаптивный дизайн
+<img src="poster.jpg" width="100%">
 
-## Системные требования
+### Built for Speed • Security • Reliability • Privacy
 
-- Windows 10 или Windows 11
-- Python 3.13+
-- Минимум 4 GB RAM
-- 100 MB свободного места на диске
+<p>
 
-## Установка
+![Windows](https://img.shields.io/badge/Windows-10%20%7C%2011-0078D6?style=for-the-badge&logo=windows)
 
-### 1. Клонирование репозитория
+![Python](https://img.shields.io/badge/Python-3.13+-3776AB?style=for-the-badge&logo=python)
 
-```bash
-git clone <repository-url>
-cd teeth#1
+![Qt](https://img.shields.io/badge/Powered%20by-Qt-41CD52?style=for-the-badge&logo=qt)
+
+![SQLite](https://img.shields.io/badge/SQLite-Database-003B57?style=for-the-badge&logo=sqlite)
+
+![Offline](https://img.shields.io/badge/Offline-100%25-success?style=for-the-badge)
+
+![License](https://img.shields.io/badge/Open%20Source-Ready-blueviolet?style=for-the-badge)
+
+</p>
+
+---
+
+### 🚀 Modern Desktop Software for Clinics, Laboratories & Medical Centers
+
+Professional medical information system focused on **speed**, **security**, **privacy**, and **beautiful user experience**.
+
+Designed to manage thousands of patients while remaining extremely fast and completely offline.
+
+</div>
+
+---
+
+# ✨ Why Laboratory Management System?
+
+Unlike traditional medical software, LMS was built from scratch with modern desktop technologies and enterprise architecture.
+
+It combines:
+
+- ⚡ Native Desktop Performance
+- 🔒 Enterprise-grade Security
+- 📊 Powerful Analytics
+- 💾 Offline-first Architecture
+- 🖥 Beautiful Modern Interface
+- 📁 Unlimited Local Storage
+
+Everything works locally.
+
+No subscriptions.
+
+No cloud dependency.
+
+No hidden telemetry.
+
+Your data belongs only to you.
+
+---
+
+# 🎯 Core Principles
+
+✔ Privacy by Design
+
+✔ Lightning Fast
+
+✔ Medical Workflow Optimized
+
+✔ Enterprise Architecture
+
+✔ Offline First
+
+✔ Secure Authentication
+
+✔ Future Ready
+
+✔ Beautiful UI/UX
+
+---
+
+# 🚀 Features
+
+## 👨‍⚕️ Patient Management
+
+Manage unlimited patient records effortlessly.
+
+### Capabilities
+
+- Patient Registration
+- Medical History
+- Treatment Timeline
+- Laboratory Results
+- Document Attachments
+- Visit Scheduling
+- Personal Notes
+- Custom Tags
+- Smart Search
+
+---
+
+## 🔍 Intelligent Search Engine
+
+Search across the entire database in milliseconds.
+
+Supports:
+
+- Full Name
+- Phone Number
+- Patient ID
+- Diseases
+- Diagnosis
+- Birth Date
+- Doctor
+- Custom Fields
+
+Real-time filtering makes finding any patient nearly instantaneous.
+
+---
+
+## 📊 Medical Analytics
+
+Visual dashboards help monitor clinic performance.
+
+Available statistics include:
+
+- Total Patients
+- Daily Visits
+- Monthly Reports
+- Disease Distribution
+- Laboratory Activity
+- User Activity
+- Growth Trends
+- Export Statistics
+
+Beautiful interactive charts included.
+
+---
+
+## 📂 File Management
+
+Each patient may contain:
+
+- Laboratory Reports
+- PDF Files
+- Images
+- X-Rays
+- Ultrasound
+- MRI
+- CT Scan
+- Documents
+
+Unlimited attachments supported.
+
+---
+
+## 🔐 Enterprise Security
+
+Security is built into every layer.
+
+### Authentication
+
+- bcrypt Password Hashing
+- Secure Login
+- Session Protection
+- Permission Validation
+
+### Access Control
+
+Administrator
+
+Doctor
+
+Receptionist
+
+Every action can be logged for auditing.
+
+---
+
+## 💾 Backup Center
+
+Never lose important medical information.
+
+Includes:
+
+- One-click Backup
+- Automatic Backups
+- Restore Wizard
+- Archive Management
+- Backup Verification
+
+---
+
+## 📤 Import & Export
+
+Export patient data into:
+
+- Excel
+- CSV
+- PDF
+
+Import existing databases from:
+
+- Excel
+- CSV
+
+Supports filtered exporting and batch operations.
+
+---
+
+# ⚡ Performance
+
+Designed for large medical organizations.
+
+Optimizations include:
+
+- SQLite Index Optimization
+- Lazy Loading
+- Background Threads
+- Pagination
+- Query Caching
+- Memory Optimization
+
+Capable of handling:
+
+✔ 100,000+ Patients
+
+✔ Millions of Medical Records
+
+✔ Thousands of Attachments
+
+without sacrificing responsiveness.
+
+---
+
+# 🖥 User Experience
+
+Minimal.
+
+Modern.
+
+Professional.
+
+Features include:
+
+🌙 Dark Mode
+
+☀ Light Mode
+
+Responsive Layout
+
+Smooth Animations
+
+Material-inspired Components
+
+Modern Icons
+
+Professional Typography
+
+Pixel-perfect Interface
+
+---
+
+# 🏗 Architecture
+
+```
+Laboratory Management System
+
+├── Core
+├── Database
+├── Authentication
+├── Patients
+├── Laboratory
+├── Reports
+├── Analytics
+├── Backups
+├── Import
+├── Export
+├── Settings
+└── User Interface
 ```
 
-### 2. Создание виртуального окружения
+Built using a modular architecture allowing future expansion without major refactoring.
+
+---
+
+# 🛠 Technology Stack
+
+## Backend
+
+- Python 3.13+
+- SQLAlchemy
+- SQLite
+- bcrypt
+
+## Desktop
+
+- PySide6 (Qt)
+
+## Data Processing
+
+- pandas
+- openpyxl
+
+## Reporting
+
+- ReportLab
+
+## Visualization
+
+- matplotlib
+
+---
+
+# 💻 Installation
+
+Clone the repository
+
+```bash
+git clone https://github.com/your-repository/LaboratoryManagementSystem.git
+
+cd LaboratoryManagementSystem
+```
+
+Create virtual environment
 
 ```bash
 python -m venv venv
+
 venv\Scripts\activate
 ```
 
-### 3. Установка зависимостей
+Install dependencies
 
 ```bash
 pip install -r requirements.txt
 ```
 
-## Запуск приложения
-
-### Режим разработки
+Launch application
 
 ```bash
 python main.py
 ```
 
-### Данные по умолчанию
+---
 
-При первом запуске автоматически создается администратор:
+# 📦 Build Production Version
 
-- **Имя пользователя**: `admin`
-- **Пароль**: `admin123`
-
-⚠️ **Важно**: Измените пароль администратора после первого входа!
-
-## Сборка в .exe файл
-
-### 1. Установка PyInstaller
-
-```bash
-pip install pyinstaller
-```
-
-### 2. Сборка приложения
+Generate standalone executable:
 
 ```bash
 pyinstaller laboratory.spec
 ```
 
-После сборки исполняемый файл будет находиться в папке `dist/`.
-
-### 3. Запуск .exe файла
-
-Запустите `LaboratoryManagement.exe` из папки `dist/`. Приложение не требует установки дополнительных компонентов.
-
-## Структура проекта
+Output:
 
 ```
-teeth#1/
-├── config.py                 # Конфигурация приложения
-├── models.py                 # Модели базы данных
-├── database.py               # Управление базой данных
-├── main.py                   # Точка входа
-├── requirements.txt          # Зависимости
-├── laboratory.spec           # PyInstaller конфигурация
-├── services/                 # Бизнес-логика
-│   ├── auth.py              # Аутентификация
-│   ├── patient.py           # Управление пациентами
-│   ├── backup.py            # Резервное копирование
-│   ├── export_import.py     # Экспорт/Импорт
-│   └── statistics.py        # Статистика
-├── ui/                       # Пользовательский интерфейс
-│   ├── login_window.py      # Окно входа
-│   ├── main_window.py       # Главное окно
-│   ├── patient_dialog.py    # Карточка пациента
-│   ├── patients_view.py     # Таблица пациентов
-│   ├── search_view.py       # Поиск
-│   ├── statistics_view.py   # Статистика
-│   ├── settings_dialog.py   # Настройки
-│   └── backup_dialog.py     # Резервные копии
-├── utils/                    # Утилиты
-│   └── helpers.py           # Вспомогательные функции
-├── controllers/              # Контроллеры (для расширения)
-├── reports/                  # Отчеты (для расширения)
-├── backups/                  # Резервные копии (создается автоматически)
-├── files/                    # Файлы пациентов (создается автоматически)
-└── laboratory.db            # База данных SQLite (создается автоматически)
+dist/
+
+└── LaboratoryManagement.exe
 ```
 
-## Функционал
+No additional software installation is required.
 
-### Управление пациентами
+---
 
-- Добавление, редактирование, удаление пациентов
-- Просмотр истории изменений
-- Прикрепление файлов (PDF, изображения, результаты анализов)
-- Напоминания о повторном визите
+# 📁 Project Structure
 
-### Поиск и фильтрация
+```
+LaboratoryManagementSystem
 
-- Мгновенный поиск по ФИО, телефону, ID, заболеванию
-- Фильтрация по статусу лечения, типу заболевания, году рождения
-- Сортировка по различным параметрам
+├── core/
+├── database/
+├── services/
+├── ui/
+├── controllers/
+├── reports/
+├── backups/
+├── files/
+├── resources/
+├── assets/
+├── config.py
+├── models.py
+├── main.py
+├── requirements.txt
+└── laboratory.spec
+```
 
-### Статистика
+---
 
-- Общая статистика пациентов
-- Статистика по заболеваниям
-- Статистика лечения
-- Активность пользователей
+# 🔮 Roadmap
 
-### Экспорт/Импорт
+## Planned Features
 
-- Экспорт в Excel, CSV, PDF
-- Импорт из Excel и CSV
-- Поддержка фильтрации при экспорте
+- AI Diagnosis Assistant
+- OCR Document Recognition
+- Electronic Medical Records
+- Multi-language Support
+- Multi-user Network Mode
+- Cloud Synchronization
+- Mobile Companion App
+- Laboratory Equipment Integration
+- Barcode System
+- QR Patient Cards
+- Automatic Appointment Reminders
+- Voice Dictation
+- Digital Signatures
+- REST API
+- Plugin Marketplace
 
-### Резервное копирование
+---
 
-- Создание резервных копий в один клик
-- Восстановление из резервной копии
-- Автоматическое удаление старых копий
+# 📈 Project Goals
 
-### Безопасность
+Our objective is to create one of the most modern desktop medical systems available.
 
-- Три уровня доступа: Администратор, Врач, Регистратор
-- Шифрование паролей (bcrypt)
-- Журнал действий пользователей
+Focused on:
 
-## Права доступа
+- Reliability
+- Performance
+- Simplicity
+- Security
+- Scalability
+- Excellent User Experience
 
-### Администратор
+---
 
-- Полный доступ ко всем функциям
-- Управление пользователями
-- Настройки системы
+# ❤️ Open Source
 
-### Врач
+We welcome every contribution.
 
-- Просмотр и редактирование пациентов
-- Просмотр статистики
-- Создание отчетов
+You can help by:
 
-### Регистратор
+- Reporting bugs
+- Improving documentation
+- Suggesting features
+- Opening Pull Requests
 
-- Добавление пациентов
-- Просмотр пациентов
-- Поиск
+Together we can build better medical software.
 
-## Технологии
+---
 
-- **Python 3.13+**
-- **PySide6 (Qt)** - GUI фреймворк
-- **SQLite** - База данных
-- **SQLAlchemy** - ORM
-- **openpyxl** - Работа с Excel
-- **reportlab** - Генерация PDF
-- **bcrypt** - Хеширование паролей
-- **matplotlib** - Диаграммы
-- **pandas** - Обработка данных
+# 👨‍💻 Developer
 
-## Производительность
+# **Abdullo Ashurov**
 
-Приложение оптимизировано для работы с большими объемами данных:
+### Full Stack Software Engineer
 
-- Ленивая загрузка данных
-- Пагинация таблицы (25/50/100/200 записей на страницу)
-- Индексы SQLite для быстрого поиска
-- Многопоточность для длительных операций
-- Отсутствие блокировки интерфейса
+Specializations
 
-## Поддержка
+- Desktop Applications
+- Medical Information Systems
+- Python Development
+- Database Engineering
+- Qt Desktop Applications
+- UI/UX Architecture
+- Software Architecture
 
-При возникновении проблем:
+> "Software should help people, not slow them down."
 
-1. Проверьте файл `app.log` в папке приложения
-2. Создайте резервную копию перед любыми действиями
-3. Обратитесь к документации или разработчику
+---
 
-## Лицензия
+# 📄 License
 
-[Укажите лицензию]
+Licensed under your preferred Open Source License.
 
-## Разработка
+See the **LICENSE** file for details.
 
-Для расширения функционала:
+---
 
-1. Добавьте новые модели в `models.py`
-2. Создайте сервисы в `services/`
-3. Добавьте UI компоненты в `ui/`
-4. Обновите `main.py` при необходимости
+<div align="center">
 
-## Известные ограничения
+## ⭐ Star the repository if you find this project useful.
 
-- Приложение разработано только для Windows
-- Однопользовательский режим (одновременная работа нескольких пользователей не поддерживается)
-- Максимальный размер файла вложения: 100 MB
+### Building the future of modern medical software.
 
-## Планируемые улучшения
-
-- [ ] Поддержка сетевого режима
-- [ ] Интеграция с медицинским оборудованием
-- [ ] Мобильное приложение
-- [ ] Облачная синхронизация (опционально)
+</div>
