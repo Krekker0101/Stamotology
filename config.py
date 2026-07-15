@@ -70,7 +70,7 @@ class AppConfig:
         self.FILES_DIR.mkdir(parents=True, exist_ok=True)
     
     # Application
-    APP_NAME: str = "Laboratory Management System"
+    APP_NAME: str = "Стоматология"
     APP_VERSION: str = "1.0.0"
     
     # UI
@@ -113,31 +113,33 @@ def get_theme_colors(theme: Theme) -> dict:
     """Get color scheme for theme"""
     if theme == Theme.LIGHT:
         return {
-            "background": "#FFFFFF",
-            "surface": "#F5F5F5",
-            "primary": "#2196F3",
-            "primary_hover": "#1976D2",
-            "text": "#212121",
-            "text_secondary": "#757575",
-            "border": "#E0E0E0",
-            "success": "#4CAF50",
-            "warning": "#FF9800",
-            "error": "#F44336",
-            "info": "#2196F3",
+            "background": "#F6F8FC",
+            "surface": "#FFFFFF",
+            "surface_alt": "#EEF4FF",
+            "primary": "#2563EB",
+            "primary_hover": "#1D4ED8",
+            "text": "#0F172A",
+            "text_secondary": "#64748B",
+            "border": "#D8E0EE",
+            "success": "#16A34A",
+            "warning": "#D97706",
+            "error": "#DC2626",
+            "info": "#0284C7",
         }
     else:
         return {
-            "background": "#1E1E1E",
-            "surface": "#2D2D2D",
-            "primary": "#64B5F6",
-            "primary_hover": "#42A5F5",
-            "text": "#FFFFFF",
-            "text_secondary": "#B0B0B0",
-            "border": "#404040",
-            "success": "#81C784",
-            "warning": "#FFB74D",
-            "error": "#E57373",
-            "info": "#64B5F6",
+            "background": "#0B1120",
+            "surface": "#111827",
+            "surface_alt": "#172033",
+            "primary": "#60A5FA",
+            "primary_hover": "#3B82F6",
+            "text": "#F8FAFC",
+            "text_secondary": "#CBD5E1",
+            "border": "#263244",
+            "success": "#4ADE80",
+            "warning": "#FBBF24",
+            "error": "#F87171",
+            "info": "#38BDF8",
         }
 
 

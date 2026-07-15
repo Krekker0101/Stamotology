@@ -83,8 +83,9 @@ class PatientDialog(QDialog):
         
         # ID (read-only for edit)
         id_layout = QHBoxLayout()
-        id_label = QLabel("ID:")
-        id_label.setFixedWidth(100)
+        self.id_label = QLabel(tr("id") + ":")
+        id_label = self.id_label
+        id_label.setFixedWidth(140)
         self.id_edit = QLineEdit()
         self.id_edit.setReadOnly(True)
         self.id_edit.setVisible(False)
@@ -94,8 +95,9 @@ class PatientDialog(QDialog):
         
         # Full name
         name_layout = QHBoxLayout()
-        name_label = QLabel(tr("full_name_required"))
-        name_label.setFixedWidth(100)
+        self.name_label = QLabel(tr("full_name_required"))
+        name_label = self.name_label
+        name_label.setFixedWidth(140)
         self.name_edit = QLineEdit()
         self.name_edit.setPlaceholderText(tr("enter_full_name"))
         name_layout.addWidget(name_label)
@@ -104,8 +106,9 @@ class PatientDialog(QDialog):
         
         # Phone
         phone_layout = QHBoxLayout()
-        phone_label = QLabel(tr("phone_required"))
-        phone_label.setFixedWidth(100)
+        self.phone_label = QLabel(tr("phone_required"))
+        phone_label = self.phone_label
+        phone_label.setFixedWidth(140)
         self.phone_edit = QLineEdit()
         self.phone_edit.setPlaceholderText(tr("enter_phone"))
         phone_layout.addWidget(phone_label)
@@ -115,15 +118,17 @@ class PatientDialog(QDialog):
         # Birth year and gender
         birth_gender_layout = QHBoxLayout()
         
-        birth_label = QLabel(tr("birth_year_required"))
-        birth_label.setFixedWidth(100)
+        self.birth_label = QLabel(tr("birth_year_required"))
+        birth_label = self.birth_label
+        birth_label.setFixedWidth(140)
         self.birth_year_edit = QLineEdit()
         self.birth_year_edit.setPlaceholderText(tr("year"))
         self.birth_year_edit.setMaximumWidth(100)
         birth_gender_layout.addWidget(birth_label)
         birth_gender_layout.addWidget(self.birth_year_edit)
         
-        gender_label = QLabel(tr("gender_required"))
+        self.gender_label = QLabel(tr("gender_required"))
+        gender_label = self.gender_label
         self.gender_combo = QComboBox()
         self.gender_combo.addItems([tr("male"), tr("female")])
         birth_gender_layout.addWidget(gender_label)
@@ -133,8 +138,9 @@ class PatientDialog(QDialog):
         
         # Address
         address_layout = QHBoxLayout()
-        address_label = QLabel(tr("address"))
-        address_label.setFixedWidth(100)
+        self.address_label = QLabel(tr("address"))
+        address_label = self.address_label
+        address_label.setFixedWidth(140)
         self.address_edit = QLineEdit()
         self.address_edit.setPlaceholderText(tr("enter_address"))
         address_layout.addWidget(address_label)
@@ -144,8 +150,9 @@ class PatientDialog(QDialog):
         # Disease type and name
         disease_layout = QHBoxLayout()
         
-        disease_type_label = QLabel(tr("disease_type_required"))
-        disease_type_label.setFixedWidth(100)
+        self.disease_type_label = QLabel(tr("disease_type_required"))
+        disease_type_label = self.disease_type_label
+        disease_type_label.setFixedWidth(140)
         self.disease_type_combo = QComboBox()
         self.disease_type_combo.setEditable(True)
         self.load_disease_types()
@@ -155,8 +162,9 @@ class PatientDialog(QDialog):
         layout.addLayout(disease_layout)
         
         disease_name_layout = QHBoxLayout()
-        disease_name_label = QLabel(tr("disease_name_required"))
-        disease_name_label.setFixedWidth(100)
+        self.disease_name_label = QLabel(tr("disease_name_required"))
+        disease_name_label = self.disease_name_label
+        disease_name_label.setFixedWidth(140)
         self.disease_name_edit = QLineEdit()
         self.disease_name_edit.setPlaceholderText(tr("enter_disease_name"))
         disease_name_layout.addWidget(disease_name_label)
@@ -165,8 +173,9 @@ class PatientDialog(QDialog):
         
         # Treating doctor
         doctor_layout = QHBoxLayout()
-        doctor_label = QLabel(tr("treating_doctor"))
-        doctor_label.setFixedWidth(100)
+        self.doctor_label = QLabel(tr("treating_doctor"))
+        doctor_label = self.doctor_label
+        doctor_label.setFixedWidth(140)
         self.doctor_combo = QComboBox()
         self.doctor_combo.setEditable(False)
         self.load_doctors()
@@ -176,8 +185,9 @@ class PatientDialog(QDialog):
         
         # Treatment status
         status_layout = QHBoxLayout()
-        status_label = QLabel(tr("result_required"))
-        status_label.setFixedWidth(100)
+        self.status_label = QLabel(tr("result_required"))
+        status_label = self.status_label
+        status_label.setFixedWidth(140)
         self.status_combo = QComboBox()
         for status in TreatmentStatus:
             self.status_combo.addItem(get_status_display(status), status)
@@ -187,8 +197,9 @@ class PatientDialog(QDialog):
         
         # Registration date
         appointment_layout = QHBoxLayout()
-        appointment_label = QLabel(tr("registration_date_label"))
-        appointment_label.setFixedWidth(100)
+        self.appointment_label = QLabel(tr("registration_date_label"))
+        appointment_label = self.appointment_label
+        appointment_label.setFixedWidth(140)
         self.appointment_edit = QDateEdit()
         self.appointment_edit.setCalendarPopup(True)
         self.appointment_edit.setDate(QDate.currentDate())
@@ -197,7 +208,8 @@ class PatientDialog(QDialog):
         layout.addLayout(appointment_layout)
         
         # Notes
-        notes_label = QLabel(tr("notes"))
+        self.notes_label = QLabel(tr("notes"))
+        notes_label = self.notes_label
         layout.addWidget(notes_label)
         
         self.notes_edit = QTextEdit()
@@ -221,11 +233,13 @@ class PatientDialog(QDialog):
         # Buttons
         button_layout = QHBoxLayout()
         
-        add_file_button = QPushButton(tr("add_file"))
+        self.add_file_button = QPushButton(tr("add_file"))
+        add_file_button = self.add_file_button
         add_file_button.clicked.connect(self.add_file)
         button_layout.addWidget(add_file_button)
         
-        remove_file_button = QPushButton(tr("remove_file"))
+        self.remove_file_button = QPushButton(tr("remove_file"))
+        remove_file_button = self.remove_file_button
         remove_file_button.clicked.connect(self.remove_file)
         button_layout.addWidget(remove_file_button)
         
@@ -256,7 +270,8 @@ class PatientDialog(QDialog):
         self.reminder_text_edit.setPlaceholderText(tr("reminder_text"))
         reminder_layout.addWidget(self.reminder_text_edit)
         
-        add_reminder_button = QPushButton(tr("add_reminder"))
+        self.add_reminder_button = QPushButton(tr("add_reminder"))
+        add_reminder_button = self.add_reminder_button
         add_reminder_button.clicked.connect(self.add_reminder)
         reminder_layout.addWidget(add_reminder_button)
         
@@ -549,15 +564,42 @@ class PatientDialog(QDialog):
         self.tab_widget.setTabText(1, tr("files"))
         self.tab_widget.setTabText(2, tr("reminders"))
         
+        # Update field labels
+        self.id_label.setText(tr("id") + ":")
+        self.name_label.setText(tr("full_name_required"))
+        self.phone_label.setText(tr("phone_required"))
+        self.birth_label.setText(tr("birth_year_required"))
+        self.gender_label.setText(tr("gender_required"))
+        self.address_label.setText(tr("address"))
+        self.disease_type_label.setText(tr("disease_type_required"))
+        self.disease_name_label.setText(tr("disease_name_required"))
+        self.doctor_label.setText(tr("treating_doctor"))
+        self.status_label.setText(tr("result_required"))
+        self.appointment_label.setText(tr("registration_date_label"))
+        self.notes_label.setText(tr("notes"))
+
         # Update buttons
         self.save_button.setText(tr("save_patient"))
         self.cancel_button.setText(tr("cancel"))
+        self.add_file_button.setText(tr("add_file"))
+        self.remove_file_button.setText(tr("remove_file"))
+        self.add_reminder_button.setText(tr("add_reminder"))
         
-        # Reload gender combo with translated options
+        # Reload translated combo options without changing selected values
         current_gender = self.gender_combo.currentIndex()
         self.gender_combo.clear()
         self.gender_combo.addItems([tr("male"), tr("female")])
         self.gender_combo.setCurrentIndex(current_gender)
+
+        current_status = self.status_combo.currentData()
+        self.status_combo.clear()
+        for status in TreatmentStatus:
+            self.status_combo.addItem(get_status_display(status), status)
+        if current_status is not None:
+            for index in range(self.status_combo.count()):
+                if self.status_combo.itemData(index) == current_status:
+                    self.status_combo.setCurrentIndex(index)
+                    break
         
         # Update placeholders
         self.name_edit.setPlaceholderText(tr("enter_full_name"))

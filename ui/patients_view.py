@@ -6,7 +6,7 @@ from PySide6.QtWidgets import (
     QTableWidget, QTableWidgetItem, QHeaderView, QMessageBox,
     QComboBox, QLineEdit, QFileDialog
 )
-from PySide6.QtCore import Qt
+from PySide6.QtCore import Qt, QTimer
 from PySide6.QtGui import QFont
 import config
 from config import get_status_display, get_status_color
@@ -30,6 +30,10 @@ class PatientsView(QWidget):
         self.current_sort = 'id'
         self.current_sort_order = 'asc'
         self.patients = []
+        self.search_timer = QTimer(self)
+        self.search_timer.setSingleShot(True)
+        self.search_timer.setInterval(220)
+        self.search_timer.timeout.connect(self.load_data)
         self.init_ui()
     
     def init_ui(self):
@@ -58,6 +62,7 @@ class PatientsView(QWidget):
         self.search_edit.setPlaceholderText(tr("quick_search_placeholder"))
         self.search_edit.setMaximumWidth(200)
         self.search_edit.textChanged.connect(self.handle_quick_search)
+        self.search_edit.setClearButtonEnabled(True)
         header_layout.addWidget(self.search_edit)
         
         # Add patient button
@@ -120,6 +125,8 @@ class PatientsView(QWidget):
         self.table.horizontalHeader().setSectionResizeMode(QHeaderView.ResizeMode.Stretch)
         self.table.verticalHeader().setVisible(False)
         self.table.setSelectionBehavior(QTableWidget.SelectionBehavior.SelectRows)
+        self.table.setAlternatingRowColors(True)
+        self.table.setSortingEnabled(False)
         self.table.setEditTriggers(QTableWidget.EditTrigger.NoEditTriggers)
         self.table.doubleClicked.connect(self.edit_patient)
         layout.addWidget(self.table)
@@ -191,7 +198,7 @@ class PatientsView(QWidget):
         # Apply search
         search_term = self.search_edit.text().strip()
         
-        if search_term:
+        if search_term or filters:
             self.patients, self.total_count = patient_service.search_patients(
                 search_term, filters, self.current_page, page_size
             )
@@ -254,9 +261,9 @@ class PatientsView(QWidget):
         self.last_button.setEnabled(self.current_page < self.total_pages)
     
     def handle_quick_search(self):
-        """Handle quick search"""
+        """Debounce quick search to keep typing responsive on large datasets."""
         self.current_page = 1
-        self.load_data()
+        self.search_timer.start()
     
     def apply_filters(self):
         """Apply filters"""
@@ -406,11 +413,14 @@ class PatientsView(QWidget):
             }}
             QTableWidget {{
                 background-color: {colors['surface']};
+                alternate-background-color: {colors.get('surface_alt', colors['background'])};
                 border: 1px solid {colors['border']};
+                border-radius: 14px;
                 gridline-color: {colors['border']};
+                selection-background-color: {colors['primary']};
             }}
             QTableWidget::item {{
-                padding: 5px;
+                padding: 8px;
             }}
             QTableWidget::item:selected {{
                 background-color: {colors['primary']};
@@ -427,17 +437,17 @@ class PatientsView(QWidget):
             QLineEdit, QComboBox {{
                 background-color: {colors['surface']};
                 border: 1px solid {colors['border']};
-                border-radius: 3px;
-                padding: 5px;
+                border-radius: 9px;
+                padding: 8px;
                 color: {colors['text']};
             }}
             QPushButton {{
                 background-color: {colors['primary']};
                 color: white;
                 border: none;
-                border-radius: 3px;
-                padding: 8px;
-                font-weight: bold;
+                border-radius: 10px;
+                padding: 9px 14px;
+                font-weight: 700;
             }}
             QPushButton:hover {{
                 background-color: {colors['primary_hover']};

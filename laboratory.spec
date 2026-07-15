@@ -14,6 +14,7 @@ a = Analysis(
         # Include the logo image
         ('img/logo.png', 'img'),
         ('img/logo.ico', 'img'),
+        ('img/logo.svg', 'img'),
     ],
     hiddenimports=[
         'PySide6.QtCore',

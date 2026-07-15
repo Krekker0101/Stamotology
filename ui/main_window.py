@@ -6,7 +6,7 @@ from PySide6.QtWidgets import (
     QLabel, QStackedWidget, QFrame, QMessageBox, QGraphicsDropShadowEffect
 )
 from PySide6.QtCore import Qt, Signal, QSize
-from PySide6.QtGui import QFont, QPixmap, QIcon, QColor
+from PySide6.QtGui import QFont, QPixmap, QIcon, QColor, QKeySequence, QShortcut
 from pathlib import Path
 import sys
 import config
@@ -33,6 +33,7 @@ class MainWindow(QMainWindow):
         self.current_user = user
         self.current_theme = config.config.DEFAULT_THEME
         self.init_ui()
+        self.configure_shortcuts()
         self.apply_theme()
         self.load_data()
     
@@ -116,20 +117,23 @@ class MainWindow(QMainWindow):
         logo_label.setFixedSize(36, 36)
         logo_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
+        svg_path = get_resource_path("img/logo.svg")
         icon_path = get_resource_path("img/logo.ico")
-        pixmap = QIcon(str(icon_path)).pixmap(QSize(34, 34)) if icon_path.exists() else QPixmap()
-        if pixmap.isNull():
-            png_path = get_resource_path("img/logo.png")
-            if png_path.exists():
+        png_path = get_resource_path("img/logo.png")
+        if svg_path.exists():
+            logo_label.setPixmap(QIcon(str(svg_path)).pixmap(QSize(36, 36)))
+        else:
+            pixmap = QIcon(str(icon_path)).pixmap(QSize(34, 34)) if icon_path.exists() else QPixmap()
+            if pixmap.isNull() and png_path.exists():
                 pixmap = QPixmap(str(png_path)).scaled(
                     34, 34,
                     Qt.AspectRatioMode.KeepAspectRatio,
                     Qt.TransformationMode.SmoothTransformation
                 )
-        logo_label.setPixmap(pixmap)
+            logo_label.setPixmap(pixmap)
         icon_layout.addWidget(logo_label, alignment=Qt.AlignmentFlag.AlignCenter)
 
-        branding_label = QLabel("Стамотология")
+        branding_label = QLabel(config.config.APP_NAME)
         branding_label.setObjectName("brandTitle")
         branding_label.setAlignment(Qt.AlignmentFlag.AlignVCenter | Qt.AlignmentFlag.AlignLeft)
         branding_label.setWordWrap(False)
@@ -160,7 +164,10 @@ class MainWindow(QMainWindow):
         layout.addWidget(separator)
         
         # User info
-        user_label = QLabel(f"👤 {self.current_user.full_name}")
+        display_name = self.current_user.full_name
+        if display_name == "Administrator":
+            display_name = tr("administrator")
+        user_label = QLabel(f"👤 {display_name}")
         user_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
         user_font = QFont()
         user_font.setPointSize(9)
@@ -173,12 +180,12 @@ class MainWindow(QMainWindow):
             UserRole.DOCTOR: tr("doctor_role"),
             UserRole.RECEPTIONIST: tr("receptionist_role")
         }
-        role_label = QLabel(role_text.get(self.current_user.role, ""))
-        role_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        self.role_label = QLabel(role_text.get(self.current_user.role, ""))
+        self.role_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
         role_font = QFont()
         role_font.setPointSize(9)
-        role_label.setFont(role_font)
-        layout.addWidget(role_label)
+        self.role_label.setFont(role_font)
+        layout.addWidget(self.role_label)
         
         # Separator
         separator = QFrame()
@@ -231,11 +238,22 @@ class MainWindow(QMainWindow):
         return sidebar
     
     def create_sidebar_button(self, text: str) -> QPushButton:
-        """Create a styled sidebar button"""
+        """Create a styled sidebar button with accessible focus behavior."""
         button = QPushButton(text)
-        button.setMinimumHeight(45)
-        button.setFont(QFont())
+        button.setMinimumHeight(46)
+        button.setCursor(Qt.CursorShape.PointingHandCursor)
+        button.setFocusPolicy(Qt.FocusPolicy.StrongFocus)
+        button.setFont(QFont("Segoe UI", 10))
         return button
+
+    def configure_shortcuts(self):
+        """Register high-value keyboard shortcuts for clinical workflows."""
+        QShortcut(QKeySequence("Ctrl+N"), self, activated=self.add_patient)
+        QShortcut(QKeySequence("Ctrl+F"), self, activated=lambda: self.show_view(1))
+        QShortcut(QKeySequence("Ctrl+1"), self, activated=lambda: self.show_view(0))
+        QShortcut(QKeySequence("Ctrl+2"), self, activated=lambda: self.show_view(1))
+        QShortcut(QKeySequence("Ctrl+3"), self, activated=lambda: self.show_view(2))
+        QShortcut(QKeySequence("Ctrl+,"), self, activated=self.show_settings_dialog)
     
     def show_view(self, index: int):
         """Show a specific view"""
@@ -315,12 +333,7 @@ class MainWindow(QMainWindow):
             UserRole.DOCTOR: tr("doctor_role"),
             UserRole.RECEPTIONIST: tr("receptionist_role")
         }
-        # Find and update role label
-        for i in range(self.sidebar.layout().count()):
-            widget = self.sidebar.layout().itemAt(i).widget()
-            if isinstance(widget, QLabel) and widget.text() in [role_text.get(UserRole.ADMIN), role_text.get(UserRole.DOCTOR), role_text.get(UserRole.RECEPTIONIST)]:
-                widget.setText(role_text.get(self.current_user.role, ""))
-                break
+        self.role_label.setText(role_text.get(self.current_user.role, ""))
     
     def logout(self):
         """Handle logout"""
@@ -354,20 +367,37 @@ class MainWindow(QMainWindow):
                 color: {colors['text']};
                 background-color: transparent;
             }}
+            #brandHeader {{
+                background-color: {colors.get('surface_alt', colors['surface'])};
+                border-radius: 18px;
+            }}
+            #brandTitle {{
+                font-size: 16px;
+                font-weight: 700;
+                letter-spacing: 0.2px;
+            }}
+            #brandIconFrame {{
+                background-color: {colors['surface']};
+                border-radius: 16px;
+            }}
             QPushButton {{
                 background-color: {colors['surface']};
                 color: {colors['text']};
-                border: none;
-                border-radius: 5px;
+                border: 1px solid transparent;
+                border-radius: 11px;
                 text-align: left;
                 padding-left: 15px;
                 padding-right: 15px;
-                font-size: 12px;
-                font-weight: 500;
+                font-size: 13px;
+                font-weight: 600;
                 margin: 2px;
             }}
             QPushButton:hover {{
-                background-color: {colors['border']};
+                background-color: {colors.get('surface_alt', colors['border'])};
+                border-color: {colors['border']};
+            }}
+            QPushButton:focus {{
+                border: 2px solid {colors['primary']};
             }}
             QPushButton[active="true"] {{
                 background-color: {colors['primary']};
