@@ -208,7 +208,7 @@ def init_db():
                     username=config.config.DEFAULT_ADMIN_USERNAME,
                     password_hash=password_hash,
                     role=UserRole.ADMIN,
-                    full_name="Administrator",
+                    full_name="Администратор",
                     is_active=True
                 )
                 session.add(admin)

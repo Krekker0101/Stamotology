@@ -164,7 +164,10 @@ class MainWindow(QMainWindow):
         layout.addWidget(separator)
         
         # User info
-        user_label = QLabel(f"👤 {self.current_user.full_name}")
+        display_name = self.current_user.full_name
+        if display_name == "Administrator":
+            display_name = tr("administrator")
+        user_label = QLabel(f"👤 {display_name}")
         user_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
         user_font = QFont()
         user_font.setPointSize(9)
@@ -177,12 +180,12 @@ class MainWindow(QMainWindow):
             UserRole.DOCTOR: tr("doctor_role"),
             UserRole.RECEPTIONIST: tr("receptionist_role")
         }
-        role_label = QLabel(role_text.get(self.current_user.role, ""))
-        role_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        self.role_label = QLabel(role_text.get(self.current_user.role, ""))
+        self.role_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
         role_font = QFont()
         role_font.setPointSize(9)
-        role_label.setFont(role_font)
-        layout.addWidget(role_label)
+        self.role_label.setFont(role_font)
+        layout.addWidget(self.role_label)
         
         # Separator
         separator = QFrame()
@@ -330,12 +333,7 @@ class MainWindow(QMainWindow):
             UserRole.DOCTOR: tr("doctor_role"),
             UserRole.RECEPTIONIST: tr("receptionist_role")
         }
-        # Find and update role label
-        for i in range(self.sidebar.layout().count()):
-            widget = self.sidebar.layout().itemAt(i).widget()
-            if isinstance(widget, QLabel) and widget.text() in [role_text.get(UserRole.ADMIN), role_text.get(UserRole.DOCTOR), role_text.get(UserRole.RECEPTIONIST)]:
-                widget.setText(role_text.get(self.current_user.role, ""))
-                break
+        self.role_label.setText(role_text.get(self.current_user.role, ""))
     
     def logout(self):
         """Handle logout"""

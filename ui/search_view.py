@@ -33,7 +33,8 @@ class SearchView(QWidget):
         layout.setContentsMargins(15, 15, 15, 15)
         
         # Title
-        title_label = QLabel(f"🔍 {tr('advanced_search')}")
+        self.title_label = QLabel(f"🔍 {tr('advanced_search')}")
+        title_label = self.title_label
         title_font = QFont()
         title_font.setPointSize(16)
         title_font.setBold(True)
@@ -45,7 +46,8 @@ class SearchView(QWidget):
         
         # Name/Phone/ID search
         general_layout = QHBoxLayout()
-        general_layout.addWidget(QLabel(tr("name_phone_id")))
+        self.general_label = QLabel(tr("name_phone_id"))
+        general_layout.addWidget(self.general_label)
         self.general_search = QLineEdit()
         self.general_search.setPlaceholderText(tr("enter_search"))
         general_layout.addWidget(self.general_search)
@@ -53,7 +55,8 @@ class SearchView(QWidget):
         
         # Disease search
         disease_layout = QHBoxLayout()
-        disease_layout.addWidget(QLabel(tr("disease")))
+        self.disease_label = QLabel(tr("disease"))
+        disease_layout.addWidget(self.disease_label)
         self.disease_search = QLineEdit()
         self.disease_search.setPlaceholderText(tr("disease_name_placeholder"))
         disease_layout.addWidget(self.disease_search)
@@ -62,20 +65,23 @@ class SearchView(QWidget):
         # Filters row
         filter_row = QHBoxLayout()
         
-        filter_row.addWidget(QLabel(tr("status") + ":"))
+        self.status_label = QLabel(tr("status") + ":")
+        filter_row.addWidget(self.status_label)
         self.status_filter = QComboBox()
         self.status_filter.addItem(tr("all_statuses"), None)
         for status in TreatmentStatus:
             self.status_filter.addItem(get_status_display(status), status)
         filter_row.addWidget(self.status_filter)
         
-        filter_row.addWidget(QLabel(tr("disease_type") + ":"))
+        self.disease_type_label = QLabel(tr("disease_type") + ":")
+        filter_row.addWidget(self.disease_type_label)
         self.disease_type_filter = QComboBox()
         self.disease_type_filter.addItem(tr("all_types"), None)
         self.load_disease_types()
         filter_row.addWidget(self.disease_type_filter)
         
-        filter_row.addWidget(QLabel(tr("birth_year") + ":"))
+        self.birth_year_label = QLabel(tr("birth_year") + ":")
+        filter_row.addWidget(self.birth_year_label)
         self.birth_year_filter = QLineEdit()
         self.birth_year_filter.setPlaceholderText(tr("year"))
         self.birth_year_filter.setMaximumWidth(80)
@@ -287,13 +293,16 @@ class SearchView(QWidget):
     
     def update_language(self):
         """Update UI language"""
-        # Update title
-        # Find title label and update
-        for i in range(self.layout().count()):
-            widget = self.layout().itemAt(i).widget()
-            if isinstance(widget, QLabel) and "🔍" in widget.text():
-                widget.setText(f"🔍 {tr('advanced_search')}")
-                break
+        # Update labels and placeholders
+        self.title_label.setText(f"🔍 {tr('advanced_search')}")
+        self.general_label.setText(tr("name_phone_id"))
+        self.disease_label.setText(tr("disease"))
+        self.status_label.setText(tr("status") + ":")
+        self.disease_type_label.setText(tr("disease_type") + ":")
+        self.birth_year_label.setText(tr("birth_year") + ":")
+        self.general_search.setPlaceholderText(tr("enter_search"))
+        self.disease_search.setPlaceholderText(tr("disease_name_placeholder"))
+        self.birth_year_filter.setPlaceholderText(tr("year"))
         
         # Update buttons
         self.search_button.setText(f"🔎 {tr('find')}")
