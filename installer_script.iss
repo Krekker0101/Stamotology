@@ -2,7 +2,7 @@
 ; This script creates a completely standalone Windows installer
 ; No external dependencies required - everything is included
 
-#define AppName "Stamotology"
+#define AppName "Стоматология"
 #define AppVersion "1.0.0"
 #define AppPublisher "Krekker0101"
 #define AppExeName "LaboratoryManagement.exe"
@@ -59,9 +59,9 @@ Source: "img\logo.svg"; DestDir: "{app}\img"; Flags: ignoreversion
 
 [Icons]
 ; Start menu shortcut
-Name: "{group}\{#AppName}"; Filename: "{app}\{#AppExeName}"; IconFilename: "{app}\img\logo.ico"; Comment: "Stamotology"
+Name: "{group}\{#AppName}"; Filename: "{app}\{#AppExeName}"; IconFilename: "{app}\img\logo.ico"; Comment: "Стоматология"
 ; Desktop shortcut
-Name: "{autodesktop}\{#AppName}"; Filename: "{app}\{#AppExeName}"; IconFilename: "{app}\img\logo.ico"; Tasks: desktopicon; Comment: "Stamotology"
+Name: "{autodesktop}\{#AppName}"; Filename: "{app}\{#AppExeName}"; IconFilename: "{app}\img\logo.ico"; Tasks: desktopicon; Comment: "Стоматология"
 ; Quick launch shortcut (Windows 7 and below)
 Name: "{userappdata}\Microsoft\Internet Explorer\Quick Launch\{#AppName}"; Filename: "{app}\{#AppExeName}"; IconFilename: "{app}\img\logo.ico"; Tasks: quicklaunchicon
 
