@@ -287,7 +287,9 @@ class PatientDialog(QDialog):
         self.disease_type_combo.addItems(types)
     
     def load_doctors(self):
-        """Load doctors and admins from registered users, excluding the current registrator"""
+        """Load doctors and admins from registered users, excluding the current registrator.
+        If no other accounts exist, the current user (e.g. the only admin) is used so the
+        treating doctor is selected automatically."""
         doctors = []
         for user in auth_service.get_all_users():
             if not user.full_name or not user.is_active:
@@ -298,6 +300,10 @@ class PatientDialog(QDialog):
                 doctors.append(user.full_name)
 
         doctors = sorted(set(doctors))
+
+        # Fallback: if there are no other accounts, use the current user (the only admin)
+        if not doctors and self.user and getattr(self.user, 'full_name', None):
+            doctors = [self.user.full_name]
 
         if self.patient and self.patient.treating_doctor and self.patient.treating_doctor not in doctors:
             doctors.append(self.patient.treating_doctor)
