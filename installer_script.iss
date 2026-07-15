@@ -2,7 +2,7 @@
 ; This script creates a completely standalone Windows installer
 ; No external dependencies required - everything is included
 
-#define AppName "Стоматология"
+#define AppName "Stamotology"
 #define AppVersion "1.0.0"
 #define AppPublisher "Krekker0101"
 #define AppExeName "LaboratoryManagement.exe"
@@ -31,7 +31,7 @@ AlwaysShowDirOnReadyPage=yes
 AlwaysShowGroupOnReadyPage=yes
 ShowLanguageDialog=no
 AppCopyright=Copyright © 2026 {#AppPublisher}
-AppComments=Профессиональная медицинская настольная система
+AppComments=Professional Medical Desktop System
 AppContact=
 ; No external dependencies
 PrivilegesRequired=admin
@@ -59,9 +59,9 @@ Source: "img\logo.svg"; DestDir: "{app}\img"; Flags: ignoreversion
 
 [Icons]
 ; Start menu shortcut
-Name: "{group}\{#AppName}"; Filename: "{app}\{#AppExeName}"; IconFilename: "{app}\img\logo.ico"; Comment: "Стоматология"
+Name: "{group}\{#AppName}"; Filename: "{app}\{#AppExeName}"; IconFilename: "{app}\img\logo.ico"; Comment: "Stamotology"
 ; Desktop shortcut
-Name: "{autodesktop}\{#AppName}"; Filename: "{app}\{#AppExeName}"; IconFilename: "{app}\img\logo.ico"; Tasks: desktopicon; Comment: "Стоматология"
+Name: "{autodesktop}\{#AppName}"; Filename: "{app}\{#AppExeName}"; IconFilename: "{app}\img\logo.ico"; Tasks: desktopicon; Comment: "Stamotology"
 ; Quick launch shortcut (Windows 7 and below)
 Name: "{userappdata}\Microsoft\Internet Explorer\Quick Launch\{#AppName}"; Filename: "{app}\{#AppExeName}"; IconFilename: "{app}\img\logo.ico"; Tasks: quicklaunchicon
 

@@ -70,7 +70,7 @@ class AppConfig:
         self.FILES_DIR.mkdir(parents=True, exist_ok=True)
     
     # Application
-    APP_NAME: str = "Стоматология"
+    APP_NAME: str = "Stamotology"
     APP_VERSION: str = "1.0.0"
     
     # UI
