@@ -92,6 +92,9 @@ class Patient(Base):
         Index('idx_patient_disease_name', 'disease_name'),
         Index('idx_patient_treatment_status', 'treatment_status'),
         Index('idx_patient_registration_date', 'registration_date'),
+        Index('idx_patient_search_core', 'full_name', 'phone', 'disease_name', 'disease_type'),
+        Index('idx_patient_status_date', 'treatment_status', 'registration_date'),
+        Index('idx_patient_doctor', 'treating_doctor'),
     )
     
     def __repr__(self):
@@ -114,6 +117,10 @@ class Attachment(Base):
     # Relationships
     patient = relationship("Patient", back_populates="attachments")
     
+    __table_args__ = (
+        Index('idx_attachment_patient', 'patient_id'),
+    )
+
     def __repr__(self):
         return f"<Attachment(id={self.id}, file_name='{self.file_name}', patient_id={self.patient_id})>"
 
@@ -136,6 +143,7 @@ class ActionLog(Base):
     # Index for performance
     __table_args__ = (
         Index('idx_action_log_timestamp', 'timestamp'),
+        Index('idx_action_log_patient_timestamp', 'patient_id', 'timestamp'),
     )
     
     def __repr__(self):
@@ -160,6 +168,7 @@ class Reminder(Base):
     # Index for performance
     __table_args__ = (
         Index('idx_reminder_date', 'reminder_date'),
+        Index('idx_reminder_patient_date', 'patient_id', 'reminder_date'),
     )
     
     def __repr__(self):
